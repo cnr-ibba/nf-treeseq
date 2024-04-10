@@ -260,13 +260,18 @@ def make_est_sfs_input(
     type=click.Path(exists=False),
     required=True
 )
+@click.option(
+    "--confidence",
+    help="Confidence level (ex. 0.95)",
+    default=0.95,
+    type=float
+)
 def parse_est_sfs_output(
-        mapping: click.Path, pvalues: click.Path, output: click.Path):
+        mapping: click.Path, pvalues: click.Path, output: click.Path,
+        confidence: float):
     """
     inspired from: https://github.com/Popgen48/scalepopgen_v1/blob/defb5d6a8a95b3fd84bd4312c4a42ef2ef6b9b7b/modules/local/gawk/create_anc_files/main.nf
     """
-
-    raise Exception("Custom error message")
 
     output_file = open(output, "w")
     result_writer = csv.writer(output_file, delimiter=",", lineterminator="\n")
@@ -296,17 +301,27 @@ def parse_est_sfs_output(
             # all the data after the header size
             pvalues_record = PvaluesRecord(*tmp2[:len(pvalues_header)])
 
+            # est.sfs return the probability that the major allele is the ancestral
+            # using a two-tailed test. So:
+            upper_tail = 1 - ((1 - confidence) / 2)
+            lower_tail = (1 - confidence) / 2
+
+            # ok skip record if the falls in the confidence interval
+            if not (float(pvalues_record.pmajor_ancestral) > upper_tail and
+                    float(pvalues_record.pmajor_ancestral) < lower_tail):
+                continue
+
             # determine if major allele is ALT  or REF
-            if mapping_record.major == mapping_record.ref:
-                if float(pvalues_record.pmajor_ancestral) < 0.5:
+            if float(pvalues_record.pmajor_ancestral) < lower_tail:
+                if mapping_record.major == mapping_record.ref:
                     anc_allele = 1
                     der_allele = 0
                 else:
                     anc_allele = 0
                     der_allele = 1
 
-            else:
-                if float(pvalues_record.pmajor_ancestral) < 0.5:
+            if float(pvalues_record.pmajor_ancestral) > upper_tail:
+                if mapping_record.major == mapping_record.ref:
                     anc_allele = 0
                     der_allele = 1
                 else:
