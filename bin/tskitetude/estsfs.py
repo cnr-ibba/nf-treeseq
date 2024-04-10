@@ -273,6 +273,14 @@ def parse_est_sfs_output(
     inspired from: https://github.com/Popgen48/scalepopgen_v1/blob/defb5d6a8a95b3fd84bd4312c4a42ef2ef6b9b7b/modules/local/gawk/create_anc_files/main.nf
     """
 
+    # est.sfs return the probability that the major allele is the ancestral
+    # using a two-tailed test. So:
+    upper_tail = 1 - ((1 - confidence) / 2)
+    lower_tail = (1 - confidence) / 2
+
+    logger.debug(f"upper tail: {upper_tail}")
+    logger.debug(f"lower tail: {lower_tail}")
+
     output_file = open(output, "w")
     result_writer = csv.writer(output_file, delimiter=",", lineterminator="\n")
 
@@ -301,30 +309,34 @@ def parse_est_sfs_output(
             # all the data after the header size
             pvalues_record = PvaluesRecord(*tmp2[:len(pvalues_header)])
 
-            # est.sfs return the probability that the major allele is the ancestral
-            # using a two-tailed test. So:
-            upper_tail = 1 - ((1 - confidence) / 2)
-            lower_tail = (1 - confidence) / 2
+            logger.debug(f"processing {mapping_record.chrom}:{mapping_record.pos}: {pvalues_record}")
 
             # ok skip record if the falls in the confidence interval
-            if not (float(pvalues_record.pmajor_ancestral) > upper_tail and
+            if not (float(pvalues_record.pmajor_ancestral) > upper_tail or
                     float(pvalues_record.pmajor_ancestral) < lower_tail):
+                logger.debug(f"Discarding {mapping_record.chrom}:{mapping_record.pos}")
                 continue
 
             # determine if major allele is ALT  or REF
             if float(pvalues_record.pmajor_ancestral) < lower_tail:
+                logger.debug(f"pmajor_ancestral lower than {lower_tail}")
                 if mapping_record.major == mapping_record.ref:
+                    logger.debug("major allele is REF: choosing ALT as ancestral")
                     anc_allele = 1
                     der_allele = 0
                 else:
+                    logger.debug("major allele is ALT: choosing REF as ancestral")
                     anc_allele = 0
                     der_allele = 1
 
             if float(pvalues_record.pmajor_ancestral) > upper_tail:
+                logger.debug(f"pmajor_ancestral greater than {upper_tail}")
                 if mapping_record.major == mapping_record.ref:
+                    logger.debug("major allele is REF: choosing REF as ancestral")
                     anc_allele = 0
                     der_allele = 1
                 else:
+                    logger.debug("major allele is ALT: choosing ALT as ancestral")
                     anc_allele = 1
                     der_allele = 0
 

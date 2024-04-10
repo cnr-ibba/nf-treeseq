@@ -5,8 +5,8 @@ process TSINFER {
 
     container "docker.io/bunop/tskit:master"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
-        "--bind ${HOME}/.cache/tsdate/" :
-        "--volume ${HOME}/.cache/tsdate/:/.cache/tsdate/" }"""
+        "--bind ${HOME}/.cache/" :
+        "--volume ${HOME}/.cache/:/.cache/" }"""
 
     input:
     tuple val(meta), path(vcf), path(ancestral)
