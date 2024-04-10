@@ -3,7 +3,7 @@ process TSINFER {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/tskitetude:0.3.0"
+    container "docker.io/bunop/tskit:master"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind ${HOME}/.cache/tsdate/" :
         "--volume ${HOME}/.cache/tsdate/:/.cache/tsdate/" }"""

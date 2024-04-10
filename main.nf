@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    cnr-ibba/nf-tskit
+    cnr-ibba/nf-treeseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/bunop/TSKITetude
     Website: https://github.com/bunop/TSKITetude
@@ -43,7 +43,7 @@ WorkflowMain.initialise(workflow, params, log)
 include { TSKIT } from './workflows/tskit'
 
 //
-// WORKFLOW: Run main cnr-ibba/nf-tskit analysis pipeline
+// WORKFLOW: Run main cnr-ibba/nf-treeseq analysis pipeline
 //
 workflow CNR_IBBA {
     TSKIT ()

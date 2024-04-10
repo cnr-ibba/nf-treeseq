@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/cnr-ibba/nf-tskit/master/nextflow_schema.json",
-  "title": "cnr-ibba/nf-tskit pipeline parameters",
+  "$id": "https://raw.githubusercontent.com/cnr-ibba/nf-treeseq/master/nextflow_schema.json",
+  "title": "cnr-ibba/nf-treeseq pipeline parameters",
   "description": "",
   "type": "object",
   "definitions": {
