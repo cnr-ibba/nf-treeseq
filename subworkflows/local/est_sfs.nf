@@ -1,5 +1,5 @@
 //
-// calculate ancient alleles using est-sfs on ancient samples
+// call tsinfer by setting ancestrall alleles as defined by est-sfs
 //
 include { PLINK_SUBSET as ANCIENT_SUBSET    } from '../../modules/local/plink_subset.nf'
 include { PLINK_RECODE as ANCIENT_RECODE    } from '../../modules/nf-core/plink/recode/main'

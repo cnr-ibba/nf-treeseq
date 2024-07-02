@@ -64,6 +64,7 @@ include {
     TABIX_TABIX as REHEADER_TABIX           } from '../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/merge/main'
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
+include { REFERENCE                         } from '../subworkflows/local/reference'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
@@ -151,7 +152,7 @@ workflow TSKIT {
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
     if (params.with_estsfs) {
-        // prepare ancestral samples and call est-sfs
+        // prepare ancestral samples, call est-sfs and then TSINFER
         EST_SFS(
             params.outgroup1,
             params.outgroup2,
@@ -163,6 +164,10 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(EST_SFS.out.versions)
+    } else {
+        // call TSINFER using reference alleles as ancestral alleles
+        REFERENCE()
+        ch_versions = ch_versions.mix(REFERENCE.out.versions)
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
