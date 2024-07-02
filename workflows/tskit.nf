@@ -52,31 +52,18 @@ WorkflowTskit.initialise(params, log)
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include {
-    PLINK_SUBSET as FOCAL_SUBSET;
-    PLINK_SUBSET as ANCIENT_SUBSET          } from '../modules/local/plink_subset.nf'
-include {
-    PLINK_RECODE as FOCAL_RECODE;
-    PLINK_RECODE as ANCIENT_RECODE          } from '../modules/nf-core/plink/recode/main'
-include {
-    BCFTOOLS_NORM as FOCAL_NORM;
-    BCFTOOLS_NORM as ANCIENT_NORM           } from '../modules/nf-core/bcftools/norm/main'
-include {
-    BCFTOOLS_SPLIT as FOCAL_SPLIT;
-    BCFTOOLS_SPLIT as ANCIENT_SPLIT         } from '../modules/nf-core/bcftools/split/main'
+include { PLINK_SUBSET as FOCAL_SUBSET      } from '../modules/local/plink_subset.nf'
+include { PLINK_RECODE as FOCAL_RECODE      } from '../modules/nf-core/plink/recode/main'
+include { BCFTOOLS_NORM as FOCAL_NORM       } from '../modules/nf-core/bcftools/norm/main'
+include { BCFTOOLS_SPLIT as FOCAL_SPLIT     } from '../modules/nf-core/bcftools/split/main'
 include { BEAGLE5_BEAGLE as FOCAL_BEAGLE    } from '../modules/nf-core/beagle5/beagle/main'
 include { SAMTOOLS_FAIDX                    } from '../modules/nf-core/samtools/faidx/main'
 include { BCFTOOLS_REHEADER                 } from '../modules/nf-core/bcftools/reheader/main'
 include {
     TABIX_TABIX as FOCAL_TABIX;
-    TABIX_TABIX as ANCIENT_TABIX;
-    TABIX_TABIX as REHEADER_TABIX;
-    TABIX_TABIX as ANCIENT_SPLIT_TABIX      } from '../modules/nf-core/tabix/tabix/main'
+    TABIX_TABIX as REHEADER_TABIX           } from '../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/merge/main'
-include { ESTSFS_INPUT                      } from '../modules/local/estsfs_input'
-include { ESTSFS                            } from '../modules/cnr-ibba/estsfs/main'
-include { ESTSFS_OUTPUT                     } from '../modules/local/estsfs_output'
-include { TSINFER                           } from '../modules/local/tsinfer'
+include { EST_SFS                           } from '../subworkflows/local/est_sfs'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
@@ -89,16 +76,6 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/du
 def multiqc_report = []
 
 
-process GENERATE_SEED {
-    output:
-    path 'seedfile.txt'
-
-    '''
-    echo $RANDOM > seedfile.txt
-    '''
-}
-
-
 workflow TSKIT {
     ch_versions = Channel.empty()
 
@@ -107,7 +84,7 @@ workflow TSKIT {
     bim =  Channel.fromPath( "${params.plink_bfile}.bim" )
     fam =  Channel.fromPath( "${params.plink_bfile}.fam" )
 
-    focal_input_ch = bed.concat(bim, fam)
+    plink_input_ch = bed.concat(bim, fam)
         .collect()
         .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
         // .view()
@@ -116,37 +93,12 @@ workflow TSKIT {
     samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
 
     // extract the samples I want. See modules.confing for other options
-    FOCAL_SUBSET(focal_input_ch, samples_ch)
+    FOCAL_SUBSET(plink_input_ch, samples_ch)
     ch_versions = ch_versions.mix(FOCAL_SUBSET.out.versions)
-
-    // collect the outgroup sample list files. At least one outgroup
-    outgroup1 = Channel.fromPath( params.outgroup1, checkIfExists: true)
-    outgroup2 = params.outgroup2 ? Channel.fromPath(params.outgroup2, checkIfExists: true): Channel.empty()
-    outgroup3 = params.outgroup3 ? Channel.fromPath(params.outgroup3, checkIfExists: true): Channel.empty()
-    outgroup_files_ch = outgroup1
-        .concat(outgroup2)
-        .concat(outgroup3)
-    outgroups_ch = outgroup_files_ch
-        .splitCsv(header: ["breed", "sample_id"], sep: "\t", strip: true)
-        .map{ it -> "${it.breed}\t${it.sample_id}" }
-        .collectFile(name: 'outgroups.txt', newLine: true)
-        // .view()
-
-    ancient_input_ch = focal_input_ch
-        .map{ meta, bed, bim, fam -> [[id: "${bed.getBaseName(1)}.ancient"], bed, bim, fam] }
-        // .view()
-
-    // extract the ancient samples
-    ANCIENT_SUBSET(ancient_input_ch, outgroups_ch)
-    ch_versions = ch_versions.mix(ANCIENT_SUBSET.out.versions)
 
     // transform the plink files to vcf
     FOCAL_RECODE(FOCAL_SUBSET.out.bed.join(FOCAL_SUBSET.out.bim).join(FOCAL_SUBSET.out.fam))
     ch_versions = ch_versions.mix(FOCAL_RECODE.out.versions)
-
-    // transform the plink files to vcf
-    ANCIENT_RECODE(ANCIENT_SUBSET.out.bed.join(ANCIENT_SUBSET.out.bim).join(ANCIENT_SUBSET.out.fam))
-    ch_versions = ch_versions.mix(ANCIENT_RECODE.out.versions)
 
     // need to define a genome channel
     genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
@@ -160,33 +112,13 @@ workflow TSKIT {
     )
     ch_versions = ch_versions.mix(FOCAL_NORM.out.versions)
 
-    // Normalize ancient VCF
-    ANCIENT_NORM(
-        // the third element of the input channel is a tbi
-        ANCIENT_RECODE.out.vcfgz.map{ meta, vcf -> [meta, vcf, []] },
-        genome_ch
-    )
-    ch_versions = ch_versions.mix(ANCIENT_NORM.out.versions)
-
     // index focal vcf
     FOCAL_TABIX(FOCAL_NORM.out.vcf)
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
-    // index ancient vcf
-    ANCIENT_TABIX(ANCIENT_NORM.out.vcf)
-    ch_versions = ch_versions.mix(ANCIENT_TABIX.out.versions)
-
     // split data by chromosomes for focal
     FOCAL_SPLIT(FOCAL_NORM.out.vcf.join(FOCAL_TABIX.out.tbi))
     ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
-
-    // split data by chromosomes for ancestor
-    ANCIENT_SPLIT(ANCIENT_NORM.out.vcf.join(ANCIENT_TABIX.out.tbi))
-    ch_versions = ch_versions.mix(ANCIENT_SPLIT.out.versions)
-
-    // index the splitted ancestor
-    ANCIENT_SPLIT_TABIX(ANCIENT_SPLIT.out.split_vcf.transpose())
-    ch_versions = ch_versions.mix(ANCIENT_SPLIT_TABIX.out.versions)
 
     // get the chromosome name from the vcf file name
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
@@ -218,78 +150,18 @@ workflow TSKIT {
     REHEADER_TABIX(BCFTOOLS_REHEADER.out.vcf)
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
-    // merge the ancient and focal vcf
-    vcf_ch = BCFTOOLS_REHEADER.out.vcf
-        .map{ meta, it -> [[id: "samples-merged.${meta.chrom}"], it] }
-        .concat(
-            ANCIENT_SPLIT.out.split_vcf
-                .transpose()
-                .map{ meta, vcf ->
-                    chrom = vcf.name.tokenize(".")[-3]
-                    [[id: "samples-merged.${chrom}"], vcf]
-                }
-        )
-        .groupTuple()
-        // .view()
-
-    // merge the ancient and focal tbi
-    tbi_ch = REHEADER_TABIX.out.tbi
-        .map{ meta, it -> [[id: "samples-merged.${meta.chrom}"], it] }
-        .concat(
-            ANCIENT_SPLIT_TABIX.out.tbi
-                .map{ meta, tbi ->
-                    chrom = tbi.name.tokenize(".")[-4]
-                    [[id: "samples-merged.${chrom}"], tbi]
-                }
-        )
-        .groupTuple()
-        // .view()
-
-    bcftools_input_ch = vcf_ch.join(tbi_ch)
-        // .view()
-
-    BCFTOOLS_MERGE(bcftools_input_ch, [[], []], [[], []], [])
-    ch_versions = ch_versions.mix(BCFTOOLS_MERGE.out.versions)
-
-    // calculate ancestral alleles. I need to use the first() method to transform
-    // the queue in a value channel
-    ESTSFS_INPUT(
-        BCFTOOLS_MERGE.out.merged_variants,
-        samples_ch.first(),
-        outgroup_files_ch.collect()
+    // prepare ancestral samples and call est-sfs
+    EST_SFS(
+        params.outgroup1,
+        params.outgroup2,
+        params.outgroup3,
+        plink_input_ch,
+        genome_ch,
+        BCFTOOLS_REHEADER.out.vcf,
+        REHEADER_TABIX.out.tbi,
+        samples_ch
     )
-
-    // determine a seedfile
-    seedfile = GENERATE_SEED()
-
-    // call custom est-sfs
-    ESTSFS(
-        ESTSFS_INPUT.out.config
-            .join(ESTSFS_INPUT.out.input)
-            .combine(seedfile)
-    )
-    ch_versions = ch_versions.mix(ESTSFS.out.versions)
-
-    ESTSFS_OUTPUT(ESTSFS_INPUT.out.mapping.join(ESTSFS.out.pvalues_out))
-
-    tsinfer_in_ch = BCFTOOLS_REHEADER.out.vcf
-        .map{ meta, vcf -> [meta.chrom, meta, vcf] }
-        .join(
-            ESTSFS_OUTPUT.out.ancestral
-                .map{ meta, ancestral ->
-                        chrom = ancestral.name.tokenize(".")[-3]
-                        [chrom, ancestral]
-                },
-            by: [0],
-            failOnMismatch: true
-        ).map{ chrom, meta, vcf, ancestral -> [[id: meta.id], vcf, ancestral]}
-        // .view()
-
-    // now create a tstree file
-    TSINFER(
-        tsinfer_in_ch,
-        samples_ch.first()
-    )
+    ch_versions = ch_versions.mix(EST_SFS.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
