@@ -150,18 +150,20 @@ workflow TSKIT {
     REHEADER_TABIX(BCFTOOLS_REHEADER.out.vcf)
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
-    // prepare ancestral samples and call est-sfs
-    EST_SFS(
-        params.outgroup1,
-        params.outgroup2,
-        params.outgroup3,
-        plink_input_ch,
-        genome_ch,
-        BCFTOOLS_REHEADER.out.vcf,
-        REHEADER_TABIX.out.tbi,
-        samples_ch
-    )
-    ch_versions = ch_versions.mix(EST_SFS.out.versions)
+    if (params.with_estsfs) {
+        // prepare ancestral samples and call est-sfs
+        EST_SFS(
+            params.outgroup1,
+            params.outgroup2,
+            params.outgroup3,
+            plink_input_ch,
+            genome_ch,
+            BCFTOOLS_REHEADER.out.vcf,
+            REHEADER_TABIX.out.tbi,
+            samples_ch
+        )
+        ch_versions = ch_versions.mix(EST_SFS.out.versions)
+    }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
