@@ -10,7 +10,7 @@
       "type": "object",
       "fa_icon": "fas fa-terminal",
       "description": "Define where the pipeline should find input data and save output data.",
-      "required": ["outdir"],
+      "required": ["outdir", "genome"],
       "properties": {
         "outdir": {
           "type": "string",
@@ -25,6 +25,9 @@
           "fa_icon": "fas fa-envelope",
           "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
           "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+        },
+        "genome": {
+          "type": "string"
         }
       }
     },
@@ -108,6 +111,72 @@
           "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
           "hidden": true,
           "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
+        }
+      }
+    },
+    "plink": {
+      "title": "PLINK",
+      "type": "object",
+      "description": "Plink options for input files",
+      "default": "",
+      "properties": {
+        "plink_bfile": {
+          "type": "string"
+        },
+        "plink_species": {
+          "type": "string"
+        },
+        "plink_keep": {
+          "type": "string"
+        },
+        "plink_geno": {
+          "type": "number",
+          "default": 0.1
+        }
+      }
+    },
+    "est_sfs": {
+      "title": "EST-SFS",
+      "type": "object",
+      "description": "Define ancestral alleles using est-sfs",
+      "default": "",
+      "properties": {
+        "with_estsfs": {
+          "type": "boolean",
+          "default": true
+        },
+        "outgroup1": {
+          "type": "string"
+        },
+        "outgroup2": {
+          "type": "string"
+        },
+        "outgroup3": {
+          "type": "string"
+        },
+        "estsfs_model": {
+          "type": "integer",
+          "default": 2
+        },
+        "estsfs_nrandom": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    },
+    "tsdate": {
+      "title": "TSDATE",
+      "type": "object",
+      "description": "ts-date option groups",
+      "default": "",
+      "properties": {
+        "tsdate_mutation_rate": {
+          "type": "number",
+          "default": 1e-8
+        },
+        "tsdate_ne": {
+          "type": "number",
+          "default": 10000
         }
       }
     },
@@ -215,50 +284,16 @@
       "$ref": "#/definitions/max_job_request_options"
     },
     {
+      "$ref": "#/definitions/plink"
+    },
+    {
+      "$ref": "#/definitions/est_sfs"
+    },
+    {
+      "$ref": "#/definitions/tsdate"
+    },
+    {
       "$ref": "#/definitions/generic_options"
     }
-  ],
-  "properties": {
-    "plink_bfile": {
-      "type": "string"
-    },
-    "plink_species": {
-      "type": "string"
-    },
-    "plink_keep": {
-      "type": "string"
-    },
-    "plink_geno": {
-      "type": "number",
-      "default": 0.1
-    },
-    "outgroup1": {
-      "type": "string"
-    },
-    "outgroup2": {
-      "type": "string"
-    },
-    "outgroup3": {
-      "type": "string"
-    },
-    "genome": {
-      "type": "string"
-    },
-    "estsfs_model": {
-      "type": "integer",
-      "default": 2
-    },
-    "estsfs_nrandom": {
-      "type": "integer",
-      "default": 10
-    },
-    "tsdate_mutation_rate": {
-      "type": "number",
-      "default": 1e-8
-    },
-    "tsdate_ne": {
-      "type": "number",
-      "default": 1e4
-    }
-  }
+  ]
 }
