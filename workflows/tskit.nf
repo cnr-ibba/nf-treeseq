@@ -152,7 +152,7 @@ workflow TSKIT {
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
     if (params.with_estsfs) {
-        // prepare ancestral samples, call est-sfs and then TSINFER
+        // prepare ancestral samples, call est-sfs and then tsinfer
         EST_SFS(
             params.outgroup1,
             params.outgroup2,
@@ -165,7 +165,7 @@ workflow TSKIT {
         )
         ch_versions = ch_versions.mix(EST_SFS.out.versions)
     } else {
-        // call TSINFER using reference alleles as ancestral alleles
+        // call tsinfer using reference alleles as ancestral alleles
         REFERENCE()
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
     }

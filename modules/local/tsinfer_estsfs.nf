@@ -1,5 +1,5 @@
 
-process TSINFER {
+process TSINFER_ESTSFS {
     tag "$meta.id"
     label 'process_medium'
 

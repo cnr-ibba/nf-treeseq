@@ -12,7 +12,7 @@ include { BCFTOOLS_MERGE                    } from '../../modules/nf-core/bcftoo
 include { ESTSFS_INPUT                      } from '../../modules/local/estsfs_input'
 include { ESTSFS                            } from '../../modules/cnr-ibba/estsfs/main'
 include { ESTSFS_OUTPUT                     } from '../../modules/local/estsfs_output'
-include { TSINFER                           } from '../../modules/local/tsinfer'
+include { TSINFER_ESTSFS                    } from '../../modules/local/tsinfer_estsfs'
 
 
 process GENERATE_SEED {
@@ -155,7 +155,7 @@ workflow EST_SFS {
         // .view()
 
     // now create a tstree file
-    TSINFER(
+    TSINFER_ESTSFS(
         tsinfer_in_ch,
         samples_ch.first()
     )
