@@ -143,7 +143,7 @@
       "properties": {
         "with_estsfs": {
           "type": "boolean",
-          "default": true
+          "default": false
         },
         "outgroup1": {
           "type": "string"
