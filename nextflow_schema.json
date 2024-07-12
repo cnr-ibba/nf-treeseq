@@ -176,7 +176,7 @@
         },
         "tsdate_ne": {
           "type": "number",
-          "default": 10000
+          "default": 1e4
         }
       }
     },

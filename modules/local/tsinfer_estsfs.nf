@@ -26,7 +26,7 @@ process TSINFER_ESTSFS {
     create_tstree \\
         --vcf ${vcf} \\
         --focal ${sample_file} \\
-        --ancestral ${ancestral} \\
+        --ancestral_estsfs ${ancestral} \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\
