@@ -27,6 +27,9 @@ class WorkflowTskit {
         if (params.with_estsfs && !params.outgroup1) {
             Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
         }
+        if (!params.reference_as_ancestor && !params.compara_ancestor && !params.with_estsfs) {
+            Nextflow.error "Error: 'reference_as_ancestor', 'compara_ancestor' or 'with_estsfs' parameter not specified: you need to specify at least one"
+        }
     }
 
     //
