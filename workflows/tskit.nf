@@ -165,7 +165,7 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(EST_SFS.out.versions)
-    } else if (params.reference_as_ancestor) {
+    } else if (params.reference_ancestor) {
         // call tsinfer using reference alleles as ancestral alleles
         REFERENCE(
             BCFTOOLS_REHEADER.out.vcf,
