@@ -1,15 +1,15 @@
 
-process TSINFER {
+process TSINFER_REFERENCE {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/tskit:master"
+    container "docker.io/bunop/tskit:0.1.1"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind ${HOME}/.cache/" :
         "--volume ${HOME}/.cache/:/.cache/" }"""
 
     input:
-    tuple val(meta), path(vcf), path(ancestral)
+    tuple val(meta), path(vcf)
     path(sample_file)
 
     output:
@@ -26,7 +26,7 @@ process TSINFER {
     create_tstree \\
         --vcf ${vcf} \\
         --focal ${sample_file} \\
-        --ancestral ${ancestral} \\
+        --ancestral_as_reference \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\
