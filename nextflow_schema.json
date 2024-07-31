@@ -142,8 +142,7 @@
       "default": "",
       "properties": {
         "with_estsfs": {
-          "type": "boolean",
-          "default": false
+          "type": "boolean"
         },
         "outgroup1": {
           "type": "string"
@@ -176,7 +175,7 @@
         },
         "tsdate_ne": {
           "type": "number",
-          "default": 10000
+          "default": 1e4
         }
       }
     },
@@ -271,6 +270,20 @@
           "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
         }
       }
+    },
+    "ancestor_reference": {
+      "title": "Ancestor reference",
+      "type": "object",
+      "description": "The source of ancestor evidence",
+      "default": "",
+      "properties": {
+        "compara_ancestor": {
+          "type": "string"
+        },
+        "reference_ancestor": {
+          "type": "boolean"
+        }
+      }
     }
   },
   "allOf": [
@@ -294,6 +307,9 @@
     },
     {
       "$ref": "#/definitions/generic_options"
+    },
+    {
+      "$ref": "#/definitions/ancestor_reference"
     }
   ]
 }
