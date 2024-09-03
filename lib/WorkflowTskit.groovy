@@ -24,6 +24,12 @@ class WorkflowTskit {
         if (!params.genome) {
             Nextflow.error "Error: 'genome' parameter not specified"
         }
+        if (params.with_estsfs && !params.outgroup1) {
+            Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
+        }
+        if (!params.reference_ancestor && !params.compara_ancestor && !params.with_estsfs) {
+            Nextflow.error "Error: 'reference_ancestor', 'compara_ancestor' or 'with_estsfs' parameter not specified: you need to specify at least one"
+        }
     }
 
     //
