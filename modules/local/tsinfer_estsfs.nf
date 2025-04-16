@@ -5,8 +5,8 @@ process TSINFER_ESTSFS {
 
     container "docker.io/bunop/tskit:master"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
-        "--bind ${HOME}/.cache/" :
-        "--volume ${HOME}/.cache/:/.cache/" }"""
+        "--bind \${HOME}/.cache/" :
+        "--volume \${HOME}/.cache/:/.cache/" }"""
 
     input:
     tuple val(meta), path(vcf), path(ancestral)
