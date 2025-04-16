@@ -20,6 +20,5 @@ workflow REFERENCE {
     )
 
     emit:
-
     versions       = ch_versions                    // channel: [ versions.yml ]
 }

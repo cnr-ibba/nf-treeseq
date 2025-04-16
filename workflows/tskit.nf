@@ -122,7 +122,7 @@ workflow TSKIT {
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
         .transpose()
         .map{ meta, vcf ->
-            chrom = vcf.name.tokenize(".")[-3]
+            def chrom = vcf.name.tokenize(".")[-3]
             [[id: "${meta.id}.${chrom}", chrom: chrom], vcf]
         }
         // .view()
