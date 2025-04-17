@@ -65,6 +65,7 @@ include {
 include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/merge/main'
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
 include { REFERENCE                         } from '../subworkflows/local/reference'
+include { MAJOR                             } from '../subworkflows/local/major'
 include { COMPARA                           } from '../subworkflows/local/compara'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -168,6 +169,13 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
+    } else if (params.reference_major) {
+        // call tsinfer using major alleles as ancestral alleles
+        MAJOR(
+            BCFTOOLS_REHEADER.out.vcf,
+            samples_ch
+        )
+        ch_versions = ch_versions.mix(MAJOR.out.versions)
     } else if (params.compara_ancestor) {
         // call tsinfer using ancestral alleles from ensembl-compara
         ancestor_ch = Channel.fromPath( params.compara_ancestor, checkIfExists: true )
@@ -177,6 +185,9 @@ workflow TSKIT {
             samples_ch,
             ancestor_ch
         )
+        ch_versions = ch_versions.mix(COMPARA.out.versions)
+    } else {
+        error("No valid ancestral allele option provided")
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
