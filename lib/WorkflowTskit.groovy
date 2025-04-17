@@ -33,9 +33,14 @@ class WorkflowTskit {
         }
 
         // additional checks
+        if (!params.keep_samples) {
+            Nextflow.error "Error: 'keep_samples' parameter not specified"
+        }
+
         if (!params.genome) {
             Nextflow.error "Error: 'genome' parameter not specified"
         }
+
         if (params.with_estsfs && !params.outgroup1) {
             Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
         }
@@ -46,14 +51,8 @@ class WorkflowTskit {
 
     // test plink parameters
     public static void testPlinkParams(params, log) {
-        if (!params.plink_bfile) {
-            Nextflow.error "Error: 'plink_bfile' parameter not specified"
-        }
         if (!params.plink_species) {
             Nextflow.error "Error: 'plink_species' parameter not specified"
-        }
-        if (!params.plink_keep) {
-            Nextflow.error "Error: 'plink_keep' parameter not specified"
         }
     }
 

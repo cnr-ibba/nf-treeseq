@@ -43,11 +43,6 @@ class WorkflowMain {
 
         // Check AWS batch settings
         NfcoreTemplate.awsBatch(workflow, params)
-
-        // Check plink_bfile has been provided
-        if (!params.plink_bfile) {
-            Nextflow.error("Please provide a PLINK binary prefix t to the pipeline e.g. '--plink_bfile plink_prefix'")
-        }
     }
     //
     // Get attribute from genome config file e.g. fasta

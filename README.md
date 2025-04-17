@@ -43,7 +43,7 @@ While all parameters can be passed via the command line, it is recommended to us
 {
     "plink_bfile": "<binary plink prefix>",
     "plink_species": "<plink species options>",
-    "plink_keep": "<plink keep file>",
+    "keep_samples": "<plink keep file>",
     "plink_geno": 0.1,
     "genome": "<genome file>"
 }
@@ -53,7 +53,7 @@ While all parameters can be passed via the command line, it is recommended to us
 
 - **`plink_bfile`**: The binary PLINK file prefix used as the `--bfile` parameter.
 - **`plink_species`**: Species-specific options for PLINK (e.g., `--species sheep` or `--chr-set 26 no-xy no-mt --allow-no-sex`).
-- **`plink_keep`**: A TSV file with `FID` and `IID` columns indicating the samples to keep.
+- **`keep_samples`**: A TSV file with `FID` and `IID` columns indicating the samples to keep.
 - **`plink_geno`**: The PLINK `--geno` parameter (default: 0.1), which excludes SNPs with a higher missing rate.
 - **`genome`**: The genome file used by `bcftools` for allele normalization (setting ALT/REF alleles) and chromosome size correction.
 

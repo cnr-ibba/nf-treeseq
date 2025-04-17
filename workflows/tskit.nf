@@ -74,9 +74,9 @@ workflow TSKIT {
         .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
 
-    plink_input_ch = bed.concat(bim, fam)
-        .collect()
-        .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
+    // getting focal samples to keep
+    samples_ch = Channel.fromPath( params.keep_samples, checkIfExists: true )
+
     // at this point, input parameters are already validated
     if (params.plink_bfile) {
         // getting plink input files
@@ -107,7 +107,7 @@ workflow TSKIT {
             .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
             // .view()
         tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
-            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            .map{ it -> [[ id: "${it.getBaseName(3)}.focal" ], it] }
             // .view()
 
         FOCAL_SPLIT(vcf_ch.join(tbi_ch))

@@ -29,6 +29,9 @@
         "genome": {
           "type": "string",
           "description": "Reference genome"
+        },
+        "keep_samples": {
+          "type": "string"
         }
       }
     },
@@ -90,9 +93,6 @@
           "type": "string"
         },
         "plink_species": {
-          "type": "string"
-        },
-        "plink_keep": {
           "type": "string"
         },
         "plink_geno": {
