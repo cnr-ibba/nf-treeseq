@@ -101,6 +101,22 @@
         }
       }
     },
+    "vcf": {
+      "title": "VCF",
+      "type": "object",
+      "description": "VCF options for input files",
+      "default": "",
+      "properties": {
+        "vcf_file": {
+          "type": "string",
+          "description": "Path to the VCF file"
+        },
+        "tbi_file": {
+          "type": "string",
+          "description": "Path to the VCF index file"
+        }
+      }
+    },
     "est_sfs": {
       "title": "EST-SFS",
       "type": "object",
@@ -280,6 +296,9 @@
     },
     {
       "$ref": "#/definitions/plink"
+    },
+    {
+      "$ref": "#/definitions/vcf"
     },
     {
       "$ref": "#/definitions/est_sfs"

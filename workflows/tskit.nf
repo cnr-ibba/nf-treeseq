@@ -69,35 +69,53 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/du
 workflow TSKIT {
     ch_versions = Channel.empty()
 
-    // getting plink input files
-    bed =  Channel.fromPath( "${params.plink_bfile}.bed" )
-    bim =  Channel.fromPath( "${params.plink_bfile}.bim" )
-    fam =  Channel.fromPath( "${params.plink_bfile}.fam" )
-
-    plink_input_ch = bed.concat(bim, fam)
-        .collect()
-        .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
-        // .view()
-
-    // getting focal samples to keep
-    samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
-
     // need to define a genome channel
     genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
         .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
 
-    // call plink subworkflow
-    PLINK_EXTRACT(
-        plink_input_ch,
-        samples_ch,
-        genome_ch
-    )
-    ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
+    plink_input_ch = bed.concat(bim, fam)
+        .collect()
+        .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
+    // at this point, input parameters are already validated
+    if (params.plink_bfile) {
+        // getting plink input files
+        bed =  Channel.fromPath( "${params.plink_bfile}.bed" )
+        bim =  Channel.fromPath( "${params.plink_bfile}.bim" )
+        fam =  Channel.fromPath( "${params.plink_bfile}.fam" )
 
-    // split data by chromosomes for focal
-    FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
-    ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+        plink_input_ch = bed.concat(bim, fam)
+            .collect()
+            .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
+            // .view()
+
+        // call plink subworkflow
+        PLINK_EXTRACT(
+            plink_input_ch,
+            samples_ch,
+            genome_ch
+        )
+        ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
+
+        // split data by chromosomes for focal
+        FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
+        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+
+    } else if (params.vcf_file) {
+        // getting input files
+        vcf_ch = Channel.fromPath( params.vcf_file, checkIfExists: true )
+            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            // .view()
+        tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
+            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            // .view()
+
+        FOCAL_SPLIT(vcf_ch.join(tbi_ch))
+        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+
+    } else {
+        error("No valid input file provided")
+    }
 
     // get the chromosome name from the vcf file name
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
@@ -142,6 +160,7 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(EST_SFS.out.versions)
+
     } else if (params.reference_ancestor) {
         // call tsinfer using reference alleles as ancestral alleles
         REFERENCE(
@@ -149,6 +168,7 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
+
     } else if (params.reference_major) {
         // call tsinfer using major alleles as ancestral alleles
         MAJOR(
@@ -156,6 +176,7 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(MAJOR.out.versions)
+
     } else if (params.compara_ancestor) {
         // call tsinfer using ancestral alleles from ensembl-compara
         ancestor_ch = Channel.fromPath( params.compara_ancestor, checkIfExists: true )
@@ -166,6 +187,7 @@ workflow TSKIT {
             ancestor_ch
         )
         ch_versions = ch_versions.mix(COMPARA.out.versions)
+
     } else {
         error("No valid ancestral allele option provided")
     }

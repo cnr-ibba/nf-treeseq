@@ -11,7 +11,41 @@ class WorkflowTskit {
     // Check and validate parameters
     //
     public static void initialise(params, log) {
-        // Check mandatory parameters
+        // Check mandatory parameters Test for plink file or vcf file
+        if (!params.plink_bfile && !params.vcf_file) {
+            Nextflow.error "Error: 'plink_bfile' or 'vcf_file' parameter not specified"
+        }
+
+        // cannot have both plink and vcf
+        if (params.plink_bfile && params.vcf_file) {
+            Nextflow.error "Error: 'plink_bfile' and 'vcf_file' parameters are mutually exclusive; specify only one"
+        }
+
+        // check for plink input
+        if (params.plink_bfile) {
+            // test plink parameters
+            testPlinkParams(params, log)
+        } else if (params.vcf_file) {
+            // test vcf parameters
+            if (!params.tbi_file) {
+                Nextflow.error "Error: 'tbi_file' parameter not specified"
+            }
+        }
+
+        // additional checks
+        if (!params.genome) {
+            Nextflow.error "Error: 'genome' parameter not specified"
+        }
+        if (params.with_estsfs && !params.outgroup1) {
+            Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
+        }
+
+        // test tsinfer parameters
+        testTsInferParams(params, log)
+    }
+
+    // test plink parameters
+    public static void testPlinkParams(params, log) {
         if (!params.plink_bfile) {
             Nextflow.error "Error: 'plink_bfile' parameter not specified"
         }
@@ -21,22 +55,19 @@ class WorkflowTskit {
         if (!params.plink_keep) {
             Nextflow.error "Error: 'plink_keep' parameter not specified"
         }
-        if (!params.genome) {
-            Nextflow.error "Error: 'genome' parameter not specified"
-        }
-        if (params.with_estsfs && !params.outgroup1) {
-            Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
-        }
+    }
 
+    // test tsinfer parameters
+    public static void testTsInferParams(params, log) {
         // check for mutually exclusive parameters
-        def exclusiveParams = [
+        def ancestorParams = [
             params.reference_ancestor ? 1 : 0,
             params.reference_major ? 1 : 0,
             params.compara_ancestor ? 1 : 0,
             params.with_estsfs ? 1 : 0
         ]
 
-        def count = exclusiveParams.sum()
+        def count = ancestorParams.sum()
 
         if (count == 0) {
             Nextflow.error "Error: exactly one of 'reference_ancestor', 'reference_major', 'compara_ancestor' or 'with_estsfs' must be specified"
