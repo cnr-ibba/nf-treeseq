@@ -27,8 +27,33 @@ class WorkflowTskit {
         if (params.with_estsfs && !params.outgroup1) {
             Nextflow.error "Error: 'outgroup1' parameter not specified: you need to specify at least one outgroup"
         }
-        if (!params.reference_ancestor && !params.compara_ancestor && !params.with_estsfs) {
-            Nextflow.error "Error: 'reference_ancestor', 'compara_ancestor' or 'with_estsfs' parameter not specified: you need to specify at least one"
+
+        // check for mutually exclusive parameters
+        def exclusiveParams = [
+            params.reference_ancestor ? 1 : 0,
+            params.reference_major ? 1 : 0,
+            params.compara_ancestor ? 1 : 0,
+            params.with_estsfs ? 1 : 0
+        ]
+
+        def count = exclusiveParams.sum()
+
+        if (count == 0) {
+            Nextflow.error "Error: exactly one of 'reference_ancestor', 'reference_major', 'compara_ancestor' or 'with_estsfs' must be specified"
+        }
+        if (count > 1) {
+            Nextflow.error "Error: 'reference_ancestor', 'reference_major', 'compara_ancestor' and 'with_estsfs' are mutually exclusive; specify only one"
+        }
+
+        // check for tsdate_method parameter
+        def allowed_methods = [
+            "inside_outside",
+            "variational_gamma",
+            "maximization"
+        ]
+
+        if (!allowed_methods.contains(params.tsdate_method)) {
+            Nextflow.error "Error: 'tsdate_method' must be one of: ${allowed_methods.join(', ')}"
         }
     }
 

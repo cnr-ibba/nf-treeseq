@@ -1,5 +1,5 @@
 
-process TSINFER_ESTSFS {
+process TSINFER_MAJOR {
     tag "$meta.id"
     label 'process_medium'
 
@@ -9,7 +9,7 @@ process TSINFER_ESTSFS {
         "--volume \${HOME}/.cache/:/.cache/" }"""
 
     input:
-    tuple val(meta), path(vcf), path(ancestral)
+    tuple val(meta), path(vcf)
     path(sample_file)
 
     output:
@@ -26,7 +26,7 @@ process TSINFER_ESTSFS {
     create_tstree \\
         --vcf ${vcf} \\
         --focal ${sample_file} \\
-        --ancestral_estsfs ${ancestral} \\
+        --ancestral_as_major \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\

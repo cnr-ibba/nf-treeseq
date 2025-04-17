@@ -19,6 +19,7 @@ process GENERATE_SEED {
     output:
     path 'seedfile.txt'
 
+    exec:
     '''
     echo $RANDOM > seedfile.txt
     '''
@@ -93,7 +94,7 @@ workflow EST_SFS {
             ANCIENT_SPLIT.out.split_vcf
                 .transpose()
                 .map{ meta, vcf ->
-                    chrom = vcf.name.tokenize(".")[-3]
+                    def chrom = vcf.name.tokenize(".")[-3]
                     [[id: "samples-merged.${chrom}"], vcf]
                 }
         )
@@ -106,7 +107,7 @@ workflow EST_SFS {
         .concat(
             ANCIENT_SPLIT_TABIX.out.tbi
                 .map{ meta, tbi ->
-                    chrom = tbi.name.tokenize(".")[-4]
+                    def chrom = tbi.name.tokenize(".")[-4]
                     [[id: "samples-merged.${chrom}"], tbi]
                 }
         )
@@ -146,12 +147,12 @@ workflow EST_SFS {
         .join(
             ESTSFS_OUTPUT.out.ancestral
                 .map{ meta, ancestral ->
-                        chrom = ancestral.name.tokenize(".")[-3]
+                        def chrom = ancestral.name.tokenize(".")[-3]
                         [chrom, ancestral]
                 },
             by: [0],
             failOnMismatch: true
-        ).map{ chrom, meta, vcf, ancestral -> [[id: meta.id], vcf, ancestral]}
+        ).map{ _chrom, meta, vcf, ancestral -> [[id: meta.id], vcf, ancestral]}
         // .view()
 
     // now create a tstree file

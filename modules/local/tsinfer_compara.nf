@@ -3,10 +3,10 @@ process TSINFER_COMPARA {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/tskit:0.1.2"
+    container "docker.io/bunop/tskit:master"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
-        "--bind ${HOME}/.cache/" :
-        "--volume ${HOME}/.cache/:/.cache/" }"""
+        "--bind \${HOME}/.cache/" :
+        "--volume \${HOME}/.cache/:/.cache/" }"""
 
     input:
     tuple val(meta), path(vcf)

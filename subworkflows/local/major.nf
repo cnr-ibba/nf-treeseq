@@ -1,10 +1,10 @@
 //
-// call tsinfer using reference alleles as ancestral alleles
+// call tsinfer using major alleles as ancestral alleles
 //
-include { TSINFER_REFERENCE } from '../../modules/local/tsinfer_reference'
+include { TSINFER_MAJOR } from '../../modules/local/tsinfer_major'
 
 
-workflow REFERENCE {
+workflow MAJOR {
     take:
     focal_vcf_ch        // Channel: focal vcf file (phased) [ meta, Path(vcf) ]
     samples_ch          // Channel: samples file [ meta, Path(samples) ]
@@ -14,7 +14,7 @@ workflow REFERENCE {
     ch_versions = Channel.empty()
 
     // now create a tstree file
-    TSINFER_REFERENCE(
+    TSINFER_MAJOR(
         focal_vcf_ch,
         samples_ch.first()
     )

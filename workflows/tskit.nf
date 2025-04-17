@@ -27,11 +27,6 @@ WorkflowTskit.initialise(params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// ch_multiqc_config          = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-// ch_multiqc_custom_config   = params.multiqc_config ? Channel.fromPath( params.multiqc_config, checkIfExists: true ) : Channel.empty()
-// ch_multiqc_logo            = params.multiqc_logo   ? Channel.fromPath( params.multiqc_logo, checkIfExists: true ) : Channel.empty()
-// ch_multiqc_custom_methods_description = params.multiqc_methods_description ? file(params.multiqc_methods_description, checkIfExists: true) : file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -65,6 +60,7 @@ include {
 include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/merge/main'
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
 include { REFERENCE                         } from '../subworkflows/local/reference'
+include { MAJOR                             } from '../subworkflows/local/major'
 include { COMPARA                           } from '../subworkflows/local/compara'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -73,10 +69,6 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/du
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-// Info required for completion email and summary
-def multiqc_report = []
-
 
 workflow TSKIT {
     ch_versions = Channel.empty()
@@ -126,7 +118,7 @@ workflow TSKIT {
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
         .transpose()
         .map{ meta, vcf ->
-            chrom = vcf.name.tokenize(".")[-3]
+            def chrom = vcf.name.tokenize(".")[-3]
             [[id: "${meta.id}.${chrom}", chrom: chrom], vcf]
         }
         // .view()
@@ -172,6 +164,13 @@ workflow TSKIT {
             samples_ch
         )
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
+    } else if (params.reference_major) {
+        // call tsinfer using major alleles as ancestral alleles
+        MAJOR(
+            BCFTOOLS_REHEADER.out.vcf,
+            samples_ch
+        )
+        ch_versions = ch_versions.mix(MAJOR.out.versions)
     } else if (params.compara_ancestor) {
         // call tsinfer using ancestral alleles from ensembl-compara
         ancestor_ch = Channel.fromPath( params.compara_ancestor, checkIfExists: true )
@@ -181,33 +180,14 @@ workflow TSKIT {
             samples_ch,
             ancestor_ch
         )
+        ch_versions = ch_versions.mix(COMPARA.out.versions)
+    } else {
+        error("No valid ancestral allele option provided")
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-
-    //
-    // MODULE: MultiQC
-    //
-    // workflow_summary    = WorkflowTskit.paramsSummaryMultiqc(workflow, summary_params)
-    // ch_workflow_summary = Channel.value(workflow_summary)
-
-    // methods_description    = WorkflowTskit.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description, params)
-    // ch_methods_description = Channel.value(methods_description)
-
-    // ch_multiqc_files = Channel.empty()
-    // ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    // ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
-    // ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-
-    // MULTIQC (
-    //     ch_multiqc_files.collect(),
-    //     ch_multiqc_config.toList(),
-    //     ch_multiqc_custom_config.toList(),
-    //     ch_multiqc_logo.toList()
-    // )
-    // multiqc_report = MULTIQC.out.report.toList()
 }
 
 /*
@@ -218,7 +198,7 @@ workflow TSKIT {
 
 workflow.onComplete {
     if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log)
     }
     NfcoreTemplate.dump_parameters(workflow, params)
     NfcoreTemplate.summary(workflow, params, log)
