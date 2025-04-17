@@ -44,6 +44,17 @@ class WorkflowTskit {
         if (count > 1) {
             Nextflow.error "Error: 'reference_ancestor', 'reference_major', 'compara_ancestor' and 'with_estsfs' are mutually exclusive; specify only one"
         }
+
+        // check for tsdate_method parameter
+        def allowed_methods = [
+            "inside_outside",
+            "variational_gamma",
+            "maximization"
+        ]
+
+        if (!allowed_methods.contains(params.tsdate_method)) {
+            Nextflow.error "Error: 'tsdate_method' must be one of: ${allowed_methods.join(', ')}"
+        }
     }
 
     //

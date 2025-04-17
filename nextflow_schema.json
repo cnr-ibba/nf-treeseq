@@ -146,7 +146,12 @@
         "tsdate_method": {
           "type": "string",
           "default": "inside_outside",
-          "description": "TsDate method: shold be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\""
+          "description": "TsDate method: shold be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
+          "enum": [
+            "inside_outside",
+            "variational_gamma",
+            "maximization"
+          ]
         }
       }
     },
