@@ -13,7 +13,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { NF-TREESEQ  } from './workflows/nf-treeseq'
+include { TREESEQ  } from './workflows/treeseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nf-treeseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-treeseq_pipeline'
 /*
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-t
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow CNRIBBA_NF-TREESEQ {
+workflow CNRIBBA_TREESEQ {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -35,7 +35,7 @@ workflow CNRIBBA_NF-TREESEQ {
     //
     // WORKFLOW: Run pipeline
     //
-    NF-TREESEQ (
+    TREESEQ (
         samplesheet
     )
 }
@@ -63,7 +63,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    CNRIBBA_NF-TREESEQ (
+    CNRIBBA_TREESEQ (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //

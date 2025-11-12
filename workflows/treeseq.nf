@@ -1,52 +1,11 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    PRINT PARAMS SUMMARY
+    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
-
-def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
-def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
-def summary_params = paramsSummaryMap(workflow)
-
-// Print parameter summary log to screen
-log.info logo + paramsSummaryLog(workflow) + citation
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE INPUTS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-WorkflowTskit.initialise(params, log)
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CONFIG FILES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT LOCAL MODULES/SUBWORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-//
-// SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
-//
-// include { INPUT_CHECK } from '../subworkflows/local/input_check'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT NF-CORE MODULES/SUBWORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-//
-// MODULE: Installed directly from nf-core/modules
-//
+include { paramsSummaryMap       } from 'plugin/nf-schema'
+include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_nf-treeseq_pipeline'
 include { PLINK_SUBSET as FOCAL_SUBSET      } from '../modules/local/plink_subset.nf'
 include { PLINK_RECODE as FOCAL_RECODE      } from '../modules/nf-core/plink/recode/main'
 include { BCFTOOLS_NORM as FOCAL_NORM       } from '../modules/nf-core/bcftools/norm/main'
@@ -64,13 +23,19 @@ include { MAJOR                             } from '../subworkflows/local/major'
 include { COMPARA                           } from '../subworkflows/local/compara'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow TSKIT {
+workflow TREESEQ {
+
+    take:
+    ch_samplesheet // channel: samplesheet read in from --input
+    main:
+
     ch_versions = Channel.empty()
 
     // getting plink input files
@@ -188,23 +153,22 @@ workflow TSKIT {
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-}
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    COMPLETION EMAIL AND SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+    //
+    // Collate and save software versions
+    //
+    softwareVersionsToYAML(ch_versions)
+        .collectFile(
+            storeDir: "${params.outdir}/pipeline_info",
+            name:  'nf-treeseq_software_'  + 'versions.yml',
+            sort: true,
+            newLine: true
+        ).set { ch_collated_versions }
 
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log)
-    }
-    NfcoreTemplate.dump_parameters(workflow, params)
-    NfcoreTemplate.summary(workflow, params, log)
-    if (params.hook_url) {
-        NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
-    }
+
+    emit:
+    versions       = ch_versions                 // channel: [ path(versions.yml) ]
+
 }
 
 /*
