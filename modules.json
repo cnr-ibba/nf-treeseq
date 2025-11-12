@@ -1,7 +1,7 @@
 {
-  "name": "tskit-pipeline",
-  "homePage": "https://github.com/bunop/TSKITetude",
-  "repos": {
+    "name": "cnr-ibba/nf-treeseq",
+    "homePage": "https://github.com/cnr-ibba/nf-treeseq",
+    "repos": {
     "https://github.com/cnr-ibba/nf-modules.git": {
       "modules": {
         "cnr-ibba": {
