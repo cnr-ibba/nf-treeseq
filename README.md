@@ -1,4 +1,3 @@
-
 # nf-treeseq
 
 A Nextflow pipeline for generating Tree Sequences from PLINK and VCF files.
@@ -9,7 +8,7 @@ A Nextflow pipeline for generating Tree Sequences from PLINK and VCF files.
 
 ## Background
 
-This pipeline is designed to infer *Tree Sequences* from genotype data. It is currently tailored for PLINK genotype files, where all relevant samples are contained within a single file. The pipeline converts the PLINK file into a VCF file, corrects ALT/REF alleles, and checks chromosome sizes. It then uses Beagle to impute and phase any missing data before running `tsinfer` to create Tree Sequences from the VCF file.
+This pipeline is designed to infer _Tree Sequences_ from genotype data. It is currently tailored for PLINK genotype files, where all relevant samples are contained within a single file. The pipeline converts the PLINK file into a VCF file, corrects ALT/REF alleles, and checks chromosome sizes. It then uses Beagle to impute and phase any missing data before running `tsinfer` to create Tree Sequences from the VCF file.
 
 ### About Ancestral Alleles
 
@@ -41,11 +40,11 @@ While all parameters can be passed via the command line, it is recommended to us
 
 ```json
 {
-    "plink_bfile": "<binary plink prefix>",
-    "plink_species": "<plink species options>",
-    "plink_keep": "<plink keep file>",
-    "plink_geno": 0.1,
-    "genome": "<genome file>"
+  "plink_bfile": "<binary plink prefix>",
+  "plink_species": "<plink species options>",
+  "plink_keep": "<plink keep file>",
+  "plink_geno": 0.1,
+  "genome": "<genome file>"
 }
 ```
 
@@ -67,7 +66,7 @@ To use the reference genome for inferring ancestral alleles, simply set the `ref
 
 ```json
 {
-    "reference_ancestor": true
+  "reference_ancestor": true
 }
 ```
 
@@ -77,10 +76,10 @@ To infer ancestral alleles using `est-sfs`, enable the `with_estsfs` flag and sp
 
 ```json
 {
-    "with_estsfs": true,
-    "outgroup1": "<outgroup1 samples file>",
-    "outgroup2": "<outgroup2 samples file>",
-    "outgroup3": "<outgroup3 samples file>"
+  "with_estsfs": true,
+  "outgroup1": "<outgroup1 samples file>",
+  "outgroup2": "<outgroup2 samples file>",
+  "outgroup3": "<outgroup3 samples file>"
 }
 ```
 
@@ -100,7 +99,7 @@ After generating the file, specify it using the `compara_ancestor` parameter:
 
 ```json
 {
-    "compara_ancestor": "<compara file>"
+  "compara_ancestor": "<compara file>"
 }
 ```
 

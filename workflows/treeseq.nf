@@ -38,14 +38,18 @@ workflow TREESEQ {
 
     ch_versions = Channel.empty()
 
-    // getting plink input files
-    bed =  Channel.fromPath( "${params.plink_bfile}.bed" )
-    bim =  Channel.fromPath( "${params.plink_bfile}.bim" )
-    fam =  Channel.fromPath( "${params.plink_bfile}.fam" )
-
-    plink_input_ch = bed.concat(bim, fam)
-        .collect()
-        .map{ it -> [[ id: "${it[0].getBaseName(1)}.focal" ], it[0], it[1], it[2]] }
+    ch_samplesheet
+        .map{ meta, plink_file ->
+            def bed = file("${plink_file}.bed")
+            def bim = file("${plink_file}.bim")
+            def fam = file("${plink_file}.fam")
+            if ( !bed.exists() || !bim.exists() || !fam.exists() ) {
+                error("PLINK binary files (.bed, .bim, .fam) for sample '${meta.id}' not found at: ${plink_file}.bed, ${plink_file}.bim, ${plink_file}.fam")
+            }
+            return [ meta, [ bed, bim, fam ] ]
+        }
+        .map{ _meta, plink -> [[ id: "${plink[0].getBaseName(1)}.focal" ], plink[0], plink[1], plink[2]] }
+        .set { plink_input_ch }
         // .view()
 
     // getting focal samples to keep
@@ -165,9 +169,9 @@ workflow TREESEQ {
             newLine: true
         ).set { ch_collated_versions }
 
-
     emit:
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
+    versions            = ch_versions                 // channel: [ path(versions.yml) ]
+    collated_versions   = ch_collated_versions        // channel: path(collated_versions.yml)
 
 }
 
