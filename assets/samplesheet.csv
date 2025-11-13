@@ -1,2 +1,2 @@
 sample,plink_bfile
-test,tests/test_dataset
+test,https://github.com/cnr-ibba/nf-treeseq/raw/refs/heads/master/tests/test_dataset

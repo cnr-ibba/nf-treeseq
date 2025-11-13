@@ -1,0 +1,30 @@
+{
+    "-profile test": {
+        "content": [
+            11,
+            null,
+            [
+                "focal",
+                "focal/test_dataset.focal.26.vcf.gz",
+                "focal/test_dataset.focal.26.vcf.gz.tbi",
+                "pipeline_info",
+                "pipeline_info/nf-treeseq_software_versions.yml",
+                "pipeline_info/software_versions.yml",
+                "tsinfer",
+                "tsinfer/test_dataset.focal.26.samples",
+                "tsinfer/test_dataset.focal.26.trees"
+            ],
+            [
+                "test_dataset.focal.26.vcf.gz:md5,73fb5108e54229f805c736f744346140",
+                "test_dataset.focal.26.vcf.gz.tbi:md5,95a43953e0b4871e0e4f3fd75b873205",
+                "test_dataset.focal.26.samples:md5,33652c756d4fc522dfe11749c453784e",
+                "test_dataset.focal.26.trees:md5,a69d95456feb1a09722829bc1e714744"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-11-13T13:15:48.779653867"
+    }
+}
