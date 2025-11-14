@@ -1,0 +1,40 @@
+{
+  "// Configurazione esempio per server MCP": "",
+  "// Questa configurazione potrebbe funzionare con estensioni che supportano MCP": "",
+  "// come alcune versioni di GitHub Copilot, Claude, o altri client MCP": "",
+  "": "",
+  "mcp.servers": {
+    "nf-treeseq": {
+      "command": "python3",
+      "args": [
+        "/home/paolo/Projects/NEXTFLOWetude/nf-treeseq/mcp_server/server.py"
+      ],
+      "env": {},
+      "autoStart": true,
+      "description": "MCP server for nf-treeseq Nextflow pipeline management"
+    }
+  },
+
+  "// In alternativa, se usi un client MCP diverso, la configurazione potrebbe essere:": "",
+  "copilot.mcp.servers": {
+    "nf-treeseq": {
+      "command": "python3",
+      "args": [
+        "/home/paolo/Projects/NEXTFLOWetude/nf-treeseq/mcp_server/server.py"
+      ]
+    }
+  },
+
+  "// Oppure per Claude Desktop o altri client standalone:": "",
+  "// Crea il file di configurazione ~/.config/claude/config.json con:": "",
+  "/*
+  {
+    "mcpServers": {
+      "nf-treeseq": {
+        "command": "python3",
+        "args": ["/home/paolo/Projects/NEXTFLOWetude/nf-treeseq/mcp_server/server.py"]
+      }
+    }
+  }
+  */"
+}

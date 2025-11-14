@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start nf-treeseq MCP Server",
+      "type": "shell",
+      "command": "python3",
+      "args": ["${workspaceFolder}/mcp_server/server.py"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Test MCP Server",
+      "type": "shell",
+      "command": "python3",
+      "args": ["${workspaceFolder}/mcp_server/test_client.py"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}
