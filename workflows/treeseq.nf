@@ -88,16 +88,16 @@ workflow TREESEQ {
         .transpose()
         .map{ meta, vcf ->
             def chrom = vcf.name.tokenize(".")[-3]
-            [[id: "${meta.id}.${chrom}", chrom: chrom], vcf]
+            [[id: "${meta.id}.${chrom}", chrom: chrom], vcf, [], [], [], [], [], []]
         }
         // .view()
 
     // phase and inpute with beagle5
-    FOCAL_BEAGLE(beagle_in_ch, [], [], [], [])
+    FOCAL_BEAGLE(beagle_in_ch)
     ch_versions = ch_versions.mix(FOCAL_BEAGLE.out.versions)
 
     // index genome sequence
-    SAMTOOLS_FAIDX(genome_ch, [[], []])
+    SAMTOOLS_FAIDX(genome_ch, [[], []], [])
     ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     // when I have two queues of different size, I can use the first() method
