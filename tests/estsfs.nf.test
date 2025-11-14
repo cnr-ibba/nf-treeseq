@@ -10,7 +10,6 @@ nextflow_pipeline {
             params {
                 outdir = "$outputDir"
                 ancestor_method = 'est-sfs'
-                ancestor_file = null
                 outgroup1 = "$projectDir/tests/test_outgroup.tsv"
             }
         }

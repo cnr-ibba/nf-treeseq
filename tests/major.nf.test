@@ -10,7 +10,6 @@ nextflow_pipeline {
             params {
                 outdir = "$outputDir"
                 ancestor_method = 'major'
-                ancestor_file = null
             }
         }
 

@@ -23,7 +23,7 @@ This pipeline is designed to infer _Tree Sequences_ from genotype data. It is cu
 
 1. **Using the reference genome**: The REF allele in the VCF file is used as the ancestral allele.
 2. **Using `est-sfs`**: This method estimates the site frequency spectrum and infers ancestral alleles. It requires the presence of outgroup samples (ancestral to the rest of the data) in the dataset.
-3. **Using `compara`**: This method requires an additional CSV file containing the ancestral alleles.
+3. **Using `custom`**: This method requires an additional CSV file containing the ancestral alleles.
 
 ## Getting the Pipeline
 
@@ -90,9 +90,9 @@ To infer ancestral alleles using `est-sfs`, enable the `with_estsfs` flag and sp
 }
 ```
 
-#### 3. Using `compara` to Infer Ancestral Alleles
+#### 3. Using `custom` to Infer Ancestral Alleles
 
-To use `compara` for inferring ancestral alleles, provide a CSV file with the following format:
+To use `custom` for inferring ancestral alleles, provide a CSV file with the following format:
 
 ```csv
 chrom,position,alleles,anc_allele
@@ -102,11 +102,11 @@ chrom,position,alleles,anc_allele
 26,361728,G/T,G
 ```
 
-After generating the file, specify it using the `compara_ancestor` parameter:
+After generating the file, specify it using the `ancestor_file` parameter:
 
 ```json
 {
-  "compara_ancestor": "<compara file>"
+  "ancestor_file": "<custom ancestor file>"
 }
 ```
 

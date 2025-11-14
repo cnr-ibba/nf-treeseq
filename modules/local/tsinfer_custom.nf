@@ -1,5 +1,5 @@
 
-process TSINFER_COMPARA {
+process TSINFER_CUSTOM {
     tag "$meta.id"
     label 'process_medium'
 

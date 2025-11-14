@@ -20,7 +20,7 @@ include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
 include { REFERENCE                         } from '../subworkflows/local/reference'
 include { MAJOR                             } from '../subworkflows/local/major'
-include { COMPARA                           } from '../subworkflows/local/compara'
+include { CUSTOM                            } from '../subworkflows/local/custom'
 include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 
@@ -140,16 +140,16 @@ workflow TREESEQ {
             samples_ch
         )
         ch_versions = ch_versions.mix(MAJOR.out.versions)
-    } else if (params.ancestor_method == 'compara') {
-        // call tsinfer using ancestral alleles from ensembl-compara
+    } else if (params.ancestor_method == 'custom') {
+        // call tsinfer using custom ancestral alleles from user-provided file
         ancestor_ch = Channel.fromPath( params.ancestor_file, checkIfExists: true )
 
-        COMPARA(
+        CUSTOM(
             BCFTOOLS_REHEADER.out.vcf,
             samples_ch,
             ancestor_ch
         )
-        ch_versions = ch_versions.mix(COMPARA.out.versions)
+        ch_versions = ch_versions.mix(CUSTOM.out.versions)
     } else {
         error("No valid ancestral allele option provided")
     }

@@ -56,17 +56,17 @@
                 "ancestor_method": {
                     "type": "string",
                     "description": "How the ancestral allele is determined",
-                    "enum": ["est-sfs", "compara", "reference", "major"],
-                    "default": "compara",
-                    "help_text": "Scegli il metodo per determinare l'allele ancestrale"
+                    "enum": ["est-sfs", "custom", "reference", "major"],
+                    "default": "reference",
+                    "help_text": "How the ancestral allele is determined: 'est-sfs' uses outgroup samples and the est-sfs program to infer the ancestral allele; 'custom' uses a custom TSV file; 'reference' uses the reference genome allele as ancestral; 'major' uses the major allele as ancestral."
                 },
                 "ancestor_file": {
                     "type": "string",
                     "format": "file-path",
                     "description": "Accessory file needed for some ancestor inference methods",
-                    "help_text": "Required for methods: compara",
+                    "help_text": "Required for methods: custom",
                     "dependRequired": {
-                        "ancestor_method": ["compara"]
+                        "ancestor_method": ["custom"]
                     },
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
