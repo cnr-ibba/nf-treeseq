@@ -47,6 +47,109 @@
                 }
             }
         },
+        "ancestor_config": {
+            "title": "Ancestor configuration",
+            "type": "object",
+            "description": "The source of ancestor evidence",
+            "default": "",
+            "properties": {
+                "ancestor_method": {
+                    "type": "string",
+                    "description": "How the ancestral allele is determined",
+                    "enum": ["est-sfs", "compara", "reference", "major"],
+                    "default": "compara",
+                    "help_text": "Scegli il metodo per determinare l'allele ancestrale"
+                },
+                "ancestor_file": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Accessory file needed for some ancestor inference methods",
+                    "help_text": "Required for methods: compara",
+                    "dependRequired": {
+                        "ancestor_method": ["compara"]
+                    },
+                    "mimetype": "text/csv",
+                    "schema": "assets/ancestor_file_schema.json"
+                }
+            }
+        },
+        "tsdate": {
+            "title": "TSDATE",
+            "type": "object",
+            "description": "ts-date option groups",
+            "default": "",
+            "properties": {
+                "tsdate_mutation_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "The estimated mutation rate per unit of genome per unit time"
+                },
+                "tsdate_ne": {
+                    "type": "integer",
+                    "default": 10000,
+                    "description": "The estimated (diploid) effective population size used to construct the (default) conditional coalescent prior"
+                },
+                "tsdate_method": {
+                    "type": "string",
+                    "default": "variational_gamma",
+                    "description": "TsDate method: shold be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
+                    "enum": ["inside_outside", "variational_gamma", "maximization"]
+                }
+            }
+        },
+        "plink": {
+            "title": "PLINK",
+            "type": "object",
+            "description": "Plink options for input files",
+            "default": "",
+            "properties": {
+                "plink_species": {
+                    "type": "string",
+                    "description": "Species-specific options for PLINK (e.g., `--species sheep` or `--chr-set 26 no-xy no-mt --allow-no-sex`)"
+                },
+                "plink_keep": {
+                    "type": "string",
+                    "description": "A TSV file with `FID` and `IID` columns indicating the samples to keep",
+                    "format": "file-path"
+                },
+                "plink_geno": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "The PLINK `--geno` parameter (default: 0.1), which excludes SNPs with a higher missing rate."
+                }
+            }
+        },
+        "est_sfs": {
+            "title": "EST-SFS",
+            "type": "object",
+            "description": "Define ancestral alleles using est-sfs",
+            "default": "",
+            "properties": {
+                "outgroup1": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
+                },
+                "outgroup2": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
+                },
+                "outgroup3": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
+                },
+                "estsfs_model": {
+                    "type": "integer",
+                    "default": 2
+                },
+                "estsfs_nrandom": {
+                    "type": "integer",
+                    "default": 10
+                }
+            }
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -92,74 +195,6 @@
                     "description": "Institutional config URL link.",
                     "hidden": true,
                     "fa_icon": "fas fa-users-cog"
-                }
-            }
-        },
-        "plink": {
-            "title": "PLINK",
-            "type": "object",
-            "description": "Plink options for input files",
-            "default": "",
-            "properties": {
-                "plink_species": {
-                    "type": "string"
-                },
-                "plink_keep": {
-                    "type": "string"
-                },
-                "plink_geno": {
-                    "type": "number",
-                    "default": 0.1
-                }
-            }
-        },
-        "est_sfs": {
-            "title": "EST-SFS",
-            "type": "object",
-            "description": "Define ancestral alleles using est-sfs",
-            "default": "",
-            "properties": {
-                "with_estsfs": {
-                    "type": "boolean"
-                },
-                "outgroup1": {
-                    "type": "string"
-                },
-                "outgroup2": {
-                    "type": "string"
-                },
-                "outgroup3": {
-                    "type": "string"
-                },
-                "estsfs_model": {
-                    "type": "integer",
-                    "default": 2
-                },
-                "estsfs_nrandom": {
-                    "type": "integer",
-                    "default": 10
-                }
-            }
-        },
-        "tsdate": {
-            "title": "TSDATE",
-            "type": "object",
-            "description": "ts-date option groups",
-            "default": "",
-            "properties": {
-                "tsdate_mutation_rate": {
-                    "type": "number",
-                    "default": 1e-8
-                },
-                "tsdate_ne": {
-                    "type": "number",
-                    "default": 10000
-                },
-                "tsdate_method": {
-                    "type": "string",
-                    "default": "variational_gamma",
-                    "description": "TsDate method: shold be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
-                    "enum": ["inside_outside", "variational_gamma", "maximization"]
                 }
             }
         },
@@ -225,23 +260,6 @@
                     "fa_icon": "far fa-calendar-alt"
                 }
             }
-        },
-        "ancestor_reference": {
-            "title": "Ancestor reference",
-            "type": "object",
-            "description": "The source of ancestor evidence",
-            "default": "",
-            "properties": {
-                "compara_ancestor": {
-                    "type": "string"
-                },
-                "reference_ancestor": {
-                    "type": "boolean"
-                },
-                "reference_major": {
-                    "type": "boolean"
-                }
-            }
         }
     },
     "allOf": [
@@ -249,7 +267,10 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
-            "$ref": "#/$defs/institutional_config_options"
+            "$ref": "#/$defs/ancestor_config"
+        },
+        {
+            "$ref": "#/$defs/tsdate"
         },
         {
             "$ref": "#/$defs/plink"
@@ -258,13 +279,10 @@
             "$ref": "#/$defs/est_sfs"
         },
         {
-            "$ref": "#/$defs/tsdate"
+            "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
-        },
-        {
-            "$ref": "#/$defs/ancestor_reference"
         }
     ]
 }

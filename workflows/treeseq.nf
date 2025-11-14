@@ -113,7 +113,7 @@ workflow TREESEQ {
     REHEADER_TABIX(BCFTOOLS_REHEADER.out.vcf)
     ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
-    if (params.with_estsfs) {
+    if (params.ancestor_method == 'est-sfs') {
         // prepare ancestral samples, call est-sfs and then tsinfer
         EST_SFS(
             params.outgroup1,
@@ -126,23 +126,23 @@ workflow TREESEQ {
             samples_ch
         )
         ch_versions = ch_versions.mix(EST_SFS.out.versions)
-    } else if (params.reference_ancestor) {
+    } else if (params.ancestor_method == 'reference') {
         // call tsinfer using reference alleles as ancestral alleles
         REFERENCE(
             BCFTOOLS_REHEADER.out.vcf,
             samples_ch
         )
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
-    } else if (params.reference_major) {
+    } else if (params.ancestor_method == 'major') {
         // call tsinfer using major alleles as ancestral alleles
         MAJOR(
             BCFTOOLS_REHEADER.out.vcf,
             samples_ch
         )
         ch_versions = ch_versions.mix(MAJOR.out.versions)
-    } else if (params.compara_ancestor) {
+    } else if (params.ancestor_method == 'compara') {
         // call tsinfer using ancestral alleles from ensembl-compara
-        ancestor_ch = Channel.fromPath( params.compara_ancestor, checkIfExists: true )
+        ancestor_ch = Channel.fromPath( params.ancestor_file, checkIfExists: true )
 
         COMPARA(
             BCFTOOLS_REHEADER.out.vcf,
