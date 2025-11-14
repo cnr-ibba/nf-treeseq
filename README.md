@@ -29,7 +29,7 @@ user-provided ancestral states.
 **Main pipeline steps:**
 
 1. **Input Processing**: Reads PLINK binary files (.bed/.bim/.fam) and applies
-  sample filtering and SNP quality control
+   sample filtering and SNP quality control
 2. **Format Conversion**: Converts PLINK data to VCF format using `plink`
 3. **Variant Normalization**: Normalizes ALT/REF alleles and validates chromosome sizes against reference genome using `bcftools`
 4. **Imputation & Phasing**: Imputes missing genotypes and phases haplotypes using Beagle
@@ -49,15 +49,15 @@ where all samples of interest are contained within a single file set. The workfl
 performs the following key transformations:
 
 1. **Quality Control & Filtering**: Applies PLINK-based SNP filtering
-  (e.g., `--geno` for missing rate) and sample selection (via `--keep` file)
+   (e.g., `--geno` for missing rate) and sample selection (via `--keep` file)
 2. **VCF Conversion**: Transforms PLINK binary format to VCF, enabling
-  integration with modern genomic tools
+   integration with modern genomic tools
 3. **Allele Normalization**: Uses a reference genome to correct ALT/REF
-  allele designations and validate chromosome coordinates via `bcftools norm`
+   allele designations and validate chromosome coordinates via `bcftools norm`
 4. **Imputation & Phasing**: Employs Beagle to fill missing genotypes and
-  resolve haplotype phase, which are critical prerequisites for accurate tree sequence inference
+   resolve haplotype phase, which are critical prerequisites for accurate tree sequence inference
 5. **Tree Sequence Inference**: Runs `tsinfer` to reconstruct ancestral
-  recombination graphs (ARGs) from phased haplotypes
+   recombination graphs (ARGs) from phased haplotypes
 
 A key requirement for `tsinfer` is the specification of ancestral alleles at
 each variant site. The pipeline offers flexible approaches to meet this requirement,
@@ -70,14 +70,14 @@ accommodating different data scenarios and biological questions
 the pipeline supports four different methods for determining ancestral alleles:
 
 1. **Using the reference allele**: The REF allele in the VCF file is used as
-  the ancestral allele (default method).
+   the ancestral allele (default method).
 2. **Using the major allele**: The most frequent allele in the dataset is used
-  as the ancestral allele.
+   as the ancestral allele.
 3. **Using `est-sfs`**: This method estimates the site frequency spectrum and
-  infers ancestral alleles. It requires the presence of outgroup samples
-  (ancestral to the rest of the data) in the dataset.
+   infers ancestral alleles. It requires the presence of outgroup samples
+   (ancestral to the rest of the data) in the dataset.
 4. **Using `custom`**: This method requires an additional CSV file containing
-  the ancestral alleles.
+   the ancestral alleles.
 
 ## Getting the Pipeline
 
@@ -117,6 +117,7 @@ nextflow run cnr-ibba/nf-treeseq \
 ```
 
 Where:
+
 - `-profile singularity` specifies the execution environment (alternative: `docker` or/and institutional profiles)
 - `-params-file params.json` points to your parameter configuration file
 - `--outdir results` sets the output directory for results
@@ -185,6 +186,7 @@ Create a file named `params.json` with at minimum the following required paramet
 #### Optional Quality Control Parameters:
 
 - **`plink_keep`**: TSV file with `FID` and `IID` columns to filter samples
+
   ```json
   "plink_keep": "samples_to_keep.tsv"
   ```
