@@ -19,6 +19,7 @@ lint:
     - docs/images/nf-core-nf-treeseq_logo_dark.png
     - docs/README.md
   nextflow_config: false
+  included_configs: false
   multiqc_config: false
   files_exist:
     - .github/workflows/awstest.yml
