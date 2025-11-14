@@ -1,0 +1,32 @@
+{
+    "-profile test": {
+        "content": [
+            22,
+            [
+                "estsfs",
+                "estsfs/samples-merged.26.ancestral.csv",
+                "estsfs/samples-merged.26.config",
+                "estsfs/samples-merged.26.mapping",
+                "estsfs/samples-merged.26.seed",
+                "estsfs/samples-merged.26.txt",
+                "estsfs/samples-merged.26_pvalues.txt",
+                "estsfs/samples-merged.26_sfs.txt",
+                "estsfs/seedfile.txt",
+                "focal",
+                "focal/test_dataset.focal.26.vcf.gz",
+                "focal/test_dataset.focal.26.vcf.gz.tbi",
+                "pipeline_info",
+                "pipeline_info/nf-treeseq_software_versions.yml",
+                "pipeline_info/software_versions.yml",
+                "tsinfer",
+                "tsinfer/test_dataset.focal.26.samples",
+                "tsinfer/test_dataset.focal.26.trees"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T14:15:25.280555623"
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/cnr-ibba/nf-treeseq/master/assets/ancestor_file_schema.json",
+    "title": "cnr-ibba/nf-treeseq pipeline - params.ancestor_file schema",
+    "description": "Schema for the file provided with params.ancestor_file",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "chrom": {
+                "type": ["string", "number"],
+                "pattern": "^\\S+$",
+                "errorMessage": "Chromosomes must be non-empty strings/number without spaces"
+            },
+            "position": {
+                "type": "integer",
+                "errorMessage": "Positions must be integers"
+            },
+            "alleles": {
+                "type": "string",
+                "pattern": "^[A,C,T,G]/[A,C,T,G]$",
+                "errorMessage": "Alleles must be like NCBI alleles (A/G, C/T, etc.)"
+            },
+            "anc_allele": {
+                "type": "string",
+                "pattern": "^[A,C,T,G]$",
+                "errorMessage": "Ancestral alleles must be one of A, C, T, G"
+            }
+        },
+        "required": ["chrom", "position", "alleles", "anc_allele"]
+    }
+}

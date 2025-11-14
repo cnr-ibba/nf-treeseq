@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/cnr-ibba/nf-treeseq/master/assets/schema_input.json",
+    "title": "cnr-ibba/nf-treeseq pipeline - params.input schema",
+    "description": "Schema for the file provided with params.input",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "plink_bfile": {
+                "type": "string",
+                "pattern": "^(?!.*\\.(bed|bim|fam)$)\\S+$",
+                "errorMessage": "PLINK binary file prefix must be provided, should be the file name without '.bed', '.bim' and '.fam' extensions"
+            }
+        },
+        "required": ["sample", "plink_bfile"]
+    }
+}

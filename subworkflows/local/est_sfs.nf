@@ -19,7 +19,7 @@ process GENERATE_SEED {
     output:
     path 'seedfile.txt'
 
-    exec:
+    script:
     '''
     echo $RANDOM > seedfile.txt
     '''
@@ -118,13 +118,13 @@ workflow EST_SFS {
         // .view()
 
     // merge the ancient and focal vcf
-    BCFTOOLS_MERGE(bcftools_input_ch, [[], []], [[], []], [])
+    BCFTOOLS_MERGE(bcftools_input_ch, [[], []], [[], []], [[], []])
     ch_versions = ch_versions.mix(BCFTOOLS_MERGE.out.versions)
 
     // calculate ancestral alleles. I need to use the first() method to transform
     // the queue in a value channel
     ESTSFS_INPUT(
-        BCFTOOLS_MERGE.out.merged_variants,
+        BCFTOOLS_MERGE.out.vcf,
         samples_ch.first(),
         outgroup_files_ch.collect()
     )

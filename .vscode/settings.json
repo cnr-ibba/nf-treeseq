@@ -1,9 +1,9 @@
 {
+    "markdown.styles": ["public/vscode_markdown.css"],
     "cSpell.words": [
         "bcftools",
         "bfile",
         "chrom",
-        "compara",
         "EMBL",
         "estsfs",
         "geno",
