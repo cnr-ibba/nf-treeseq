@@ -28,7 +28,6 @@ lint:
     - CODE_OF_CONDUCT.md
     - conf/igenomes.config
     - conf/igenomes_ignored.config
-    - conf/test_full.config
     - assets/nf-core-nf-treeseq_logo_light.png
     - assets/multiqc_config.yml
     - docs/images/nf-core-nf-treeseq_logo_light.png
