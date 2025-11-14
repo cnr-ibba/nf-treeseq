@@ -42,6 +42,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
+          lfs: true
 
       - name: get number of shards
         id: set-shards
@@ -86,6 +87,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
+          lfs: true
 
       - name: Run nf-test
         id: run_nf_test
