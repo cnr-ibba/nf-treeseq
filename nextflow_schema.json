@@ -92,7 +92,7 @@
                 "tsdate_method": {
                     "type": "string",
                     "default": "variational_gamma",
-                    "description": "TsDate method: shold be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
+                    "description": "TsDate method: should be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
                     "enum": ["inside_outside", "variational_gamma", "maximization"]
                 }
             }
@@ -110,6 +110,7 @@
                 "plink_keep": {
                     "type": "string",
                     "description": "A TSV file with `FID` and `IID` columns indicating the samples to keep",
+                    "mimetype": "text/tsv",
                     "format": "file-path"
                 },
                 "plink_geno": {
@@ -128,16 +129,19 @@
                 "outgroup1": {
                     "type": "string",
                     "format": "file-path",
+                    "mimetype": "text/tsv",
                     "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
                 },
                 "outgroup2": {
                     "type": "string",
                     "format": "file-path",
+                    "mimetype": "text/tsv",
                     "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
                 },
                 "outgroup3": {
                     "type": "string",
                     "format": "file-path",
+                    "mimetype": "text/tsv",
                     "description": "est-sfs outgrup file (TSV format with `FID` and `IID` columns)"
                 },
                 "estsfs_model": {
@@ -205,12 +209,6 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "help": {
-                    "type": "boolean",
-                    "description": "Display help text.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
@@ -258,6 +256,20 @@
                     "hidden": true,
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "fa_icon": "far fa-calendar-alt"
+                },
+                "help": {
+                    "type": "boolean",
+                    "description": "Display help text.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
+                "help_full": {
+                    "type": "boolean",
+                    "description": "Display the full detailed help message."
+                },
+                "show_hidden": {
+                    "type": "boolean",
+                    "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
                 }
             }
         }

@@ -1,17 +1,16 @@
 nextflow_pipeline {
 
-    name "Test pipeline with est-sfs"
+    name "Test pipeline with reference alleles as ancestors"
     script "../main.nf"
-    tag "est-sfs"
+    tag "reference"
 
     test("-profile test") {
 
         when {
             params {
                 outdir = "$outputDir"
-                ancestor_method = 'est-sfs'
+                ancestor_method = 'reference'
                 ancestor_file = null
-                outgroup1 = "$projectDir/tests/test_outgroup.tsv"
             }
         }
 
