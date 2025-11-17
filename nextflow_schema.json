@@ -65,9 +65,6 @@
                     "format": "file-path",
                     "description": "Accessory file needed for some ancestor inference methods",
                     "help_text": "Required for methods: custom",
-                    "dependRequired": {
-                        "ancestor_method": ["custom"]
-                    },
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
                 }

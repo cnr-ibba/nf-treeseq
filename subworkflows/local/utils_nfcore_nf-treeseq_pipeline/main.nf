@@ -75,6 +75,22 @@ workflow PIPELINE_INITIALISATION {
     )
 
     //
+    // Custom validation of parameters
+    //
+    // TODO: this option is plink specific for now
+    if (params.ancestor_method == 'est-sfs') {
+        if (!params.outgroup1) {
+            error "ERROR: 'outgroup1' is required (at least) when ancestor_method is 'est-sfs'"
+        }
+    }
+
+    if (params.ancestor_method == 'custom') {
+        if (!params.ancestor_file) {
+            error "ERROR: 'ancestor_file' is required when ancestor_method is 'custom'"
+        }
+    }
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -96,9 +112,6 @@ workflow PIPELINE_INITIALISATION {
                 return null
         }
         .set { ch_samplesheet }
-
-        ch_samplesheet.plink.view()
-        ch_samplesheet.vcf.view()
 
     emit:
     samplesheet_plink = ch_samplesheet.plink
