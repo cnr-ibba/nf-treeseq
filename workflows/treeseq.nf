@@ -51,25 +51,33 @@ workflow TREESEQ {
         .set { plink_input_ch }
         // .view()
 
-    // getting focal samples to keep
-    samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
+        // call plink subworkflow
+        PLINK_EXTRACT(
+            plink_input_ch,
+            samples_ch,
+            genome_ch
+        )
+        ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
 
-    // need to define a genome channel
-    genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
-        .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
-        // .view()
+        // split data by chromosomes for focal
+        FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
+        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
 
-    // call plink subworkflow
-    PLINK_EXTRACT(
-        plink_input_ch,
-        samples_ch,
-        genome_ch
-    )
-    ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
+    } else if (params.vcf_file) {
+        // getting input files
+        vcf_ch = Channel.fromPath( params.vcf_file, checkIfExists: true )
+            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            // .view()
+        tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
+            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            // .view()
 
-    // split data by chromosomes for focal
-    FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
-    ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+        FOCAL_SPLIT(vcf_ch.join(tbi_ch))
+        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+
+    } else {
+        error("No valid input file provided")
+    }
 
     // get the chromosome name from the vcf file name
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
