@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            21,
+            22,
             [
                 "estsfs",
                 "estsfs/samples-merged.26.ancestral.csv",
