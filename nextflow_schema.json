@@ -99,12 +99,13 @@
             "type": "object",
             "description": "Plink options for input files",
             "default": "",
+            "required": ["sample2fid"],
             "properties": {
                 "plink_species": {
                     "type": "string",
                     "description": "Species-specific options for PLINK (e.g., `--species sheep` or `--chr-set 26 no-xy no-mt --allow-no-sex`)"
                 },
-                "plink_keep": {
+                "sample2fid": {
                     "type": "string",
                     "description": "A TSV file with `FID` and `IID` columns indicating the samples to keep",
                     "mimetype": "text/tsv",

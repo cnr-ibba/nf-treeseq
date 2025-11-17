@@ -185,10 +185,10 @@ Create a file named `params.json` with at minimum the following required paramet
 
 #### Optional Quality Control Parameters:
 
-- **`plink_keep`**: TSV file with `FID` and `IID` columns to filter samples
+- **`sample2fid`**: TSV file with `FID` and `IID` columns to filter samples
 
   ```json
-  "plink_keep": "samples_to_keep.tsv"
+  "sample2fid": "samples_to_keep.tsv"
   ```
 
 - **`plink_geno`**: Maximum missing rate per SNP (default: `0.1`)

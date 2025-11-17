@@ -30,7 +30,7 @@ workflow TREESEQ {
     ch_versions = Channel.empty()
 
     // getting focal samples to keep (plink workflow)
-    samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
+    samples_ch = Channel.fromPath( params.sample2fid, checkIfExists: true )
 
     // call plink subworkflow
     PLINK_EXTRACT(
