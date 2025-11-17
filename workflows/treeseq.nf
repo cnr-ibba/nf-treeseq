@@ -50,7 +50,6 @@ workflow TREESEQ {
         .map{ _meta, plink -> [[ id: "${plink[0].getBaseName(1)}.focal" ], plink[0], plink[1], plink[2]] }
         .set { plink_input_ch }
         // .view()
-
         // call plink subworkflow
         PLINK_EXTRACT(
             plink_input_ch,
@@ -69,7 +68,7 @@ workflow TREESEQ {
             .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
             // .view()
         tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
-            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+            .map{ it -> [[ id: "${it.getBaseName(3)}.focal" ], it] }
             // .view()
 
         FOCAL_SPLIT(vcf_ch.join(tbi_ch))
