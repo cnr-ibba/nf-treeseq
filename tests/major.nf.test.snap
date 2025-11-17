@@ -1,14 +1,13 @@
 {
     "-profile test": {
         "content": [
-            11,
+            10,
             [
                 "focal",
                 "focal/test_dataset.focal.26.vcf.gz",
                 "focal/test_dataset.focal.26.vcf.gz.tbi",
                 "pipeline_info",
                 "pipeline_info/nf-treeseq_software_versions.yml",
-                "pipeline_info/software_versions.yml",
                 "tsinfer",
                 "tsinfer/test_dataset.focal.26.samples",
                 "tsinfer/test_dataset.focal.26.trees"

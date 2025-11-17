@@ -11,7 +11,6 @@ include { EST_SFS                           } from '../subworkflows/local/est_sf
 include { REFERENCE                         } from '../subworkflows/local/reference'
 include { MAJOR                             } from '../subworkflows/local/major'
 include { CUSTOM                            } from '../subworkflows/local/custom'
-include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,11 +96,6 @@ workflow TREESEQ {
     } else {
         error("No valid ancestral allele option provided")
     }
-
-    // TODO: plan to be removed
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
 
     //
     // Collate and save software versions
