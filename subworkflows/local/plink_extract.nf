@@ -9,13 +9,27 @@ include { TABIX_TABIX   } from '../../modules/nf-core/tabix/tabix/main'
 workflow PLINK_EXTRACT {
     take:
 
-    plink_input_ch      // Channel: plink input files [ meta, Path(bed), Path(bim), Path(fam) ]
-    samples_ch          // Channel: samples file [ meta, Path(samples) ]
-    genome_ch           // Channel: genome files [ meta, Path(fasta) ]
+    ch_samplesheet_plink    // Channel: plink input prefix [ meta, prefix ]
+    samples_ch              // Channel: samples file [ meta, Path(samples) ]
+    genome_ch               // Channel: genome files [ meta, Path(fasta) ]
 
     main:
 
     ch_versions = Channel.empty()
+
+    // here are samples in input
+    ch_samplesheet_plink
+        .map{ meta, plink_prefix ->
+            def bed = file("${plink_prefix}.bed")
+            def bim = file("${plink_prefix}.bim")
+            def fam = file("${plink_prefix}.fam")
+            if ( !bed.exists() || !bim.exists() || !fam.exists() ) {
+                error("PLINK binary files (.bed, .bim, .fam) for sample '${meta.id}' not found at: ${plink_prefix}.bed, ${plink_prefix}.bim, ${plink_prefix}.fam")
+            }
+            return [ meta, [ bed, bim, fam ] ]
+        }
+        .map{ _meta, plink -> [[ id: "${plink[0].getBaseName(1)}.focal" ], plink[0], plink[1], plink[2]] }
+        .set { plink_input_ch }
 
     // extract the samples I want. See modules.config for other options
     PLINK_SUBSET(plink_input_ch, samples_ch)
@@ -40,5 +54,6 @@ workflow PLINK_EXTRACT {
 
     vcf             = BCFTOOLS_NORM.out.vcf
     tbi             = TABIX_TABIX.out.tbi
+    plink_input     = plink_input_ch
     versions        = ch_versions                    // channel: [ versions.yml ]
 }

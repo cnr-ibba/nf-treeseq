@@ -17,8 +17,28 @@
                 "type": "string",
                 "pattern": "^(?!.*\\.(bed|bim|fam)$)\\S+$",
                 "errorMessage": "PLINK binary file prefix must be provided, should be the file name without '.bed', '.bim' and '.fam' extensions"
+            },
+            "vcf": {
+                "type": "string",
+                "pattern": "^\\S+\\.vcf(\\.gz)?$",
+                "format": "file-path",
+                "errorMessage": "VCF file must be provided and have .vcf or .vcf.gz extension"
+            },
+            "index": {
+                "type": "string",
+                "format": "file-path",
+                "pattern": "^\\S+\\.(tbi|csi)$",
+                "errorMessage": "VCF index file must be provided (.tbi or .csi)"
             }
         },
-        "required": ["sample", "plink_bfile"]
+        "required": ["sample"],
+        "oneOf": [
+            {
+                "required": ["plink_bfile"]
+            },
+            {
+                "required": ["vcf", "index"]
+            }
+        ]
     }
 }

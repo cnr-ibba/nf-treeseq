@@ -80,10 +80,29 @@ workflow PIPELINE_INITIALISATION {
 
     Channel
         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+        .branch { row ->
+            def meta = row[0]
+            def plink_bfile = row[1]
+            def vcf = row[2]
+            def index = row[3]
+
+            plink: plink_bfile && plink_bfile != [] && plink_bfile.toString() != ''
+                return [meta, plink_bfile]
+            vcf: vcf && vcf != [] && vcf.toString() != ''
+                return [meta, vcf, index]
+            invalid: true
+                // Catch-all for invalid entries
+                log.warn "Invalid entry: ${row}"
+                return null
+        }
         .set { ch_samplesheet }
 
+        ch_samplesheet.plink.view()
+        ch_samplesheet.vcf.view()
+
     emit:
-    samplesheet = ch_samplesheet
+    samplesheet_plink = ch_samplesheet.plink
+    samplesheet_vcf = ch_samplesheet.vcf
     versions    = ch_versions
 }
 

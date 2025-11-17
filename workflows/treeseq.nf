@@ -32,51 +32,50 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS       } from '../modules/nf-core/custom/du
 workflow TREESEQ {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+
+    ch_samplesheet_plink // channel: samplesheet for plink files read in from --input
+    ch_samplesheet_vcf // channel: samplesheet for vcf files read in from --input
+
     main:
 
     ch_versions = Channel.empty()
 
-    ch_samplesheet
-        .map{ meta, plink_file ->
-            def bed = file("${plink_file}.bed")
-            def bim = file("${plink_file}.bim")
-            def fam = file("${plink_file}.fam")
-            if ( !bed.exists() || !bim.exists() || !fam.exists() ) {
-                error("PLINK binary files (.bed, .bim, .fam) for sample '${meta.id}' not found at: ${plink_file}.bed, ${plink_file}.bim, ${plink_file}.fam")
-            }
-            return [ meta, [ bed, bim, fam ] ]
-        }
-        .map{ _meta, plink -> [[ id: "${plink[0].getBaseName(1)}.focal" ], plink[0], plink[1], plink[2]] }
-        .set { plink_input_ch }
+    // need to define a genome channel
+    genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
+        .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
-        // call plink subworkflow
-        PLINK_EXTRACT(
-            plink_input_ch,
-            samples_ch,
-            genome_ch
-        )
-        ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
 
-        // split data by chromosomes for focal
-        FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
-        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+    // getting focal samples to keep (plink workflow)
+    samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
 
-    } else if (params.vcf_file) {
-        // getting input files
-        vcf_ch = Channel.fromPath( params.vcf_file, checkIfExists: true )
-            .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
-            // .view()
-        tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
-            .map{ it -> [[ id: "${it.getBaseName(3)}.focal" ], it] }
-            // .view()
+    // .view()
+    // call plink subworkflow
+    PLINK_EXTRACT(
+        ch_samplesheet_plink,
+        samples_ch,
+        genome_ch
+    )
+    ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
 
-        FOCAL_SPLIT(vcf_ch.join(tbi_ch))
-        ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+    // split data by chromosomes for focal
+    FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
+    ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
 
-    } else {
-        error("No valid input file provided")
-    }
+    // } else if (params.vcf_file) {
+    //     // getting input files
+    //     vcf_ch = Channel.fromPath( params.vcf_file, checkIfExists: true )
+    //         .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
+    //         // .view()
+    //     tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
+    //         .map{ it -> [[ id: "${it.getBaseName(3)}.focal" ], it] }
+    //         // .view()
+
+    //     FOCAL_SPLIT(vcf_ch.join(tbi_ch))
+    //     ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+
+    // } else {
+    //     error("No valid input file provided")
+    // }
 
     // get the chromosome name from the vcf file name
     beagle_in_ch = FOCAL_SPLIT.out.split_vcf
@@ -87,7 +86,7 @@ workflow TREESEQ {
         }
         // .view()
 
-    // phase and inpute with beagle5
+    // phase and impute with beagle5
     FOCAL_BEAGLE(beagle_in_ch)
     ch_versions = ch_versions.mix(FOCAL_BEAGLE.out.versions)
 
@@ -110,11 +109,12 @@ workflow TREESEQ {
 
     if (params.ancestor_method == 'est-sfs') {
         // prepare ancestral samples, call est-sfs and then tsinfer
+        // TODO: this option is plink specific for now
         EST_SFS(
             params.outgroup1,
             params.outgroup2,
             params.outgroup3,
-            plink_input_ch,
+            PLINK_EXTRACT.out.plink_input,
             genome_ch,
             BCFTOOLS_REHEADER.out.vcf,
             REHEADER_TABIX.out.tbi,
