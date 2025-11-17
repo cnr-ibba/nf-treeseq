@@ -8,6 +8,11 @@ include { softwareVersionsToYAML            } from '../subworkflows/nf-core/util
 include { methodsDescriptionText            } from '../subworkflows/local/utils_nfcore_nf-treeseq_pipeline'
 include { PLINK_EXTRACT                     } from '../subworkflows/local/plink_extract'
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
+include { BCFTOOLS_SPLIT as FOCAL_SPLIT     } from '../modules/nf-core/bcftools/split/main'
+include { BEAGLE5_BEAGLE as FOCAL_BEAGLE    } from '../modules/nf-core/beagle5/beagle/main'
+include { SAMTOOLS_FAIDX                    } from '../modules/nf-core/samtools/faidx/main'
+include { BCFTOOLS_REHEADER                 } from '../modules/nf-core/bcftools/reheader/main'
+include { TABIX_TABIX as REHEADER_TABIX     } from '../modules/nf-core/tabix/tabix/main'
 include { REFERENCE                         } from '../subworkflows/local/reference'
 include { MAJOR                             } from '../subworkflows/local/major'
 include { CUSTOM                            } from '../subworkflows/local/custom'
@@ -32,32 +37,55 @@ workflow TREESEQ {
     // getting focal samples to keep (plink workflow)
     samples_ch = Channel.fromPath( params.sample2fid, checkIfExists: true )
 
-    // call plink subworkflow
-    PLINK_EXTRACT(
-        ch_samplesheet_plink,
-        samples_ch
+    // need to define a genome channel
+    genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
+        .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
+        // .view()
+
+    // this will use VCF received from samplesheet (vcf workflow)
+    FOCAL_SPLIT(ch_samplesheet_vcf)
+    ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
+
+    // get the chromosome name from the vcf file name
+    beagle_in_ch = FOCAL_SPLIT.out.split_vcf
+        .transpose()
+        .map{ meta, vcf ->
+            def chrom = vcf.name.tokenize(".")[-3]
+            [[id: "${meta.id}.${chrom}", chrom: chrom], vcf, [], [], [], [], [], []]
+        }
+        // .view()
+
+    // phase and impute with beagle5
+    FOCAL_BEAGLE(beagle_in_ch)
+    ch_versions = ch_versions.mix(FOCAL_BEAGLE.out.versions)
+
+    // index genome sequence
+    SAMTOOLS_FAIDX(genome_ch, [[], []], [])
+    ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
+
+    // when I have two queues of different size, I can use the first() method
+    // to transform the queue in a value channel
+    // https://training.nextflow.io/basic_training/channels/#value-channels
+    BCFTOOLS_REHEADER(
+        FOCAL_BEAGLE.out.vcf.map{ meta, vcf -> [meta, vcf, [], []] },
+        SAMTOOLS_FAIDX.out.fai.first()
     )
-    ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
+    ch_versions = ch_versions.mix(BCFTOOLS_REHEADER.out.versions)
 
-    // } else if (params.vcf_file) {
-    //     // getting input files
-    //     vcf_ch = Channel.fromPath( params.vcf_file, checkIfExists: true )
-    //         .map{ it -> [[ id: "${it.getBaseName(2)}.focal" ], it] }
-    //         // .view()
-    //     tbi_ch = Channel.fromPath( params.tbi_file, checkIfExists: true )
-    //         .map{ it -> [[ id: "${it.getBaseName(3)}.focal" ], it] }
-    //         // .view()
-
-    //     FOCAL_SPLIT(vcf_ch.join(tbi_ch))
-    //     ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
-
-    // } else {
-    //     error("No valid input file provided")
-    // }
+    // index beagle genotype
+    REHEADER_TABIX(BCFTOOLS_REHEADER.out.vcf)
+    ch_versions = ch_versions.mix(REHEADER_TABIX.out.versions)
 
     if (params.ancestor_method == 'est-sfs') {
         // prepare ancestral samples, call est-sfs and then tsinfer
         // TODO: this option is plink specific for now
+        // call plink subworkflow
+        PLINK_EXTRACT(
+            ch_samplesheet_plink,
+            samples_ch
+        )
+        ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
+
         EST_SFS(
             params.outgroup1,
             params.outgroup2,
@@ -72,14 +100,14 @@ workflow TREESEQ {
     } else if (params.ancestor_method == 'reference') {
         // call tsinfer using reference alleles as ancestral alleles
         REFERENCE(
-            PLINK_EXTRACT.out.vcf,
+            BCFTOOLS_REHEADER.out.vcf,
             samples_ch
         )
         ch_versions = ch_versions.mix(REFERENCE.out.versions)
     } else if (params.ancestor_method == 'major') {
         // call tsinfer using major alleles as ancestral alleles
         MAJOR(
-            PLINK_EXTRACT.out.vcf,
+            BCFTOOLS_REHEADER.out.vcf,
             samples_ch
         )
         ch_versions = ch_versions.mix(MAJOR.out.versions)
@@ -88,7 +116,7 @@ workflow TREESEQ {
         ancestor_ch = Channel.fromPath( params.ancestor_file, checkIfExists: true )
 
         CUSTOM(
-            PLINK_EXTRACT.out.vcf,
+            BCFTOOLS_REHEADER.out.vcf,
             samples_ch,
             ancestor_ch
         )
