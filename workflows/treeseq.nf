@@ -13,10 +13,9 @@ include { BCFTOOLS_SPLIT as FOCAL_SPLIT     } from '../modules/nf-core/bcftools/
 include { BEAGLE5_BEAGLE as FOCAL_BEAGLE    } from '../modules/nf-core/beagle5/beagle/main'
 include { SAMTOOLS_FAIDX                    } from '../modules/nf-core/samtools/faidx/main'
 include { BCFTOOLS_REHEADER                 } from '../modules/nf-core/bcftools/reheader/main'
-include {
-    TABIX_TABIX as FOCAL_TABIX;
-    TABIX_TABIX as REHEADER_TABIX           } from '../modules/nf-core/tabix/tabix/main'
+include { TABIX_TABIX as REHEADER_TABIX     } from '../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_MERGE                    } from '../modules/nf-core/bcftools/merge/main'
+include { PLINK_EXTRACT                     } from '../subworkflows/local/plink_extract'
 include { EST_SFS                           } from '../subworkflows/local/est_sfs'
 include { REFERENCE                         } from '../subworkflows/local/reference'
 include { MAJOR                             } from '../subworkflows/local/major'
@@ -55,32 +54,21 @@ workflow TREESEQ {
     // getting focal samples to keep
     samples_ch = Channel.fromPath( params.plink_keep, checkIfExists: true )
 
-    // extract the samples I want. See modules.confing for other options
-    FOCAL_SUBSET(plink_input_ch, samples_ch)
-    ch_versions = ch_versions.mix(FOCAL_SUBSET.out.versions)
-
-    // transform the plink files to vcf
-    FOCAL_RECODE(FOCAL_SUBSET.out.bed.join(FOCAL_SUBSET.out.bim).join(FOCAL_SUBSET.out.fam))
-    ch_versions = ch_versions.mix(FOCAL_RECODE.out.versions)
-
     // need to define a genome channel
     genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
         .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
 
-    // Normalize focal VCF
-    FOCAL_NORM(
-        FOCAL_RECODE.out.vcfgz.map{ meta, vcf -> [meta, vcf, []] },
+    // call plink subworkflow
+    PLINK_EXTRACT(
+        plink_input_ch,
+        samples_ch,
         genome_ch
     )
-    ch_versions = ch_versions.mix(FOCAL_NORM.out.versions)
-
-    // index focal vcf
-    FOCAL_TABIX(FOCAL_NORM.out.vcf)
-    ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
+    ch_versions = ch_versions.mix(PLINK_EXTRACT.out.versions)
 
     // split data by chromosomes for focal
-    FOCAL_SPLIT(FOCAL_NORM.out.vcf.join(FOCAL_TABIX.out.tbi))
+    FOCAL_SPLIT(PLINK_EXTRACT.out.vcf.join(PLINK_EXTRACT.out.tbi))
     ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
 
     // get the chromosome name from the vcf file name
@@ -111,7 +99,7 @@ workflow TREESEQ {
 
     // index beagle genotype
     REHEADER_TABIX(BCFTOOLS_REHEADER.out.vcf)
-    ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
+    ch_versions = ch_versions.mix(REHEADER_TABIX.out.versions)
 
     if (params.ancestor_method == 'est-sfs') {
         // prepare ancestral samples, call est-sfs and then tsinfer
