@@ -14,15 +14,15 @@ include { BCFTOOLS_REHEADER                 } from '../../modules/nf-core/bcftoo
 workflow PLINK_EXTRACT {
     take:
 
-    ch_samplesheet          // Channel: plink input prefix [ meta, prefix ]
-    samples_ch              // Channel: samples file [ meta, Path(samples) ]
+    ch_samplesheet          // channel: plink input prefix [ meta, prefix ]
+    samples_ch              // channel: samples file [ meta, Path(samples) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // need to define a genome channel
-    genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
+    genome_ch = channel.fromPath(params.genome, checkIfExists: true)
         .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
 

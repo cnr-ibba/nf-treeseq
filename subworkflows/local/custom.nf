@@ -6,13 +6,13 @@ include { TSINFER_CUSTOM } from '../../modules/local/tsinfer/custom/main'
 
 workflow CUSTOM {
     take:
-    focal_vcf_ch        // Channel: focal vcf file (phased) [ meta, Path(vcf) ]
-    samples_ch          // Channel: samples file [ Path(samples) ]
-    ancestor_ch         // Channel: ancestral file [ Path(ancestor) ]
+    focal_vcf_ch        // channel: focal vcf file (phased) [ meta, Path(vcf) ]
+    samples_ch          // channel: samples file [ Path(samples) ]
+    ancestor_ch         // channel: ancestral file [ Path(ancestor) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // now create a tstree file
     TSINFER_CUSTOM(

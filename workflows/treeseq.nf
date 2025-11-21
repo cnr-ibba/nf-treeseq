@@ -28,11 +28,11 @@ workflow TREESEQ {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // getting focal samples to keep (this is required to add pupulation information
     // to treesequences output files)
-    samples_ch = Channel.fromPath( params.sample2fid, checkIfExists: true )
+    samples_ch = channel.fromPath( params.sample2fid, checkIfExists: true )
 
     if (params.ancestor_method == 'est-sfs') {
         // prepare ancestral samples, call est-sfs and then tsinfer
@@ -79,7 +79,7 @@ workflow TREESEQ {
             ch_versions = ch_versions.mix(MAJOR.out.versions)
         } else if (params.ancestor_method == 'custom') {
             // call tsinfer using custom ancestral alleles from user-provided file
-            ancestor_ch = Channel.fromPath( params.ancestor_file, checkIfExists: true )
+            ancestor_ch = channel.fromPath( params.ancestor_file, checkIfExists: true )
 
             CUSTOM(
                 VCF_EXTRACT.out.vcf,

@@ -6,12 +6,12 @@ include { TSINFER_REFERENCE } from '../../modules/local/tsinfer/reference/main'
 
 workflow REFERENCE {
     take:
-    focal_vcf_ch        // Channel: focal vcf file (phased) [ meta, Path(vcf) ]
-    samples_ch          // Channel: samples file [ meta, Path(samples) ]
+    focal_vcf_ch        // channel: focal vcf file (phased) [ meta, Path(vcf) ]
+    samples_ch          // channel: samples file [ meta, Path(samples) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // now create a tstree file
     TSINFER_REFERENCE(

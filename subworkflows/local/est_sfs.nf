@@ -32,20 +32,20 @@ workflow EST_SFS {
     outgroup1           // string: outgroup1 name
     outgroup2           // string: outgroup2 name (can be null)
     outgroup3           // string: outgroup3 name (can be null)
-    plink_input_ch      // Channel: plink input files [ meta, Path(bed), Path(bim), Path(fam) ]
-    genome_ch           // Channel: genome files [ meta, Path(fasta) ]
-    focal_vcf_ch        // Channel: focal vcf file (phased) [ meta, Path(vcf) ]
-    focal_tbi_ch        // Channel: focal tbi file (phased) [ meta, Path(tbi) ]
-    samples_ch          // Channel: samples file [ meta, Path(samples) ]
+    plink_input_ch      // channel: plink input files [ meta, Path(bed), Path(bim), Path(fam) ]
+    genome_ch           // channel: genome files [ meta, Path(fasta) ]
+    focal_vcf_ch        // channel: focal vcf file (phased) [ meta, Path(vcf) ]
+    focal_tbi_ch        // channel: focal tbi file (phased) [ meta, Path(tbi) ]
+    samples_ch          // channel: samples file [ meta, Path(samples) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // collect the outgroup sample list files. At least one outgroup
-    outgroup1_ch = Channel.fromPath( outgroup1, checkIfExists: true)
-    outgroup2_ch = outgroup2 ? Channel.fromPath(params.outgroup2, checkIfExists: true): Channel.empty()
-    outgroup3_ch = outgroup3 ? Channel.fromPath(params.outgroup3, checkIfExists: true): Channel.empty()
+    outgroup1_ch = channel.fromPath( outgroup1, checkIfExists: true)
+    outgroup2_ch = outgroup2 ? channel.fromPath(params.outgroup2, checkIfExists: true): channel.empty()
+    outgroup3_ch = outgroup3 ? channel.fromPath(params.outgroup3, checkIfExists: true): channel.empty()
     outgroup_files_ch = outgroup1_ch
         .concat(outgroup2_ch)
         .concat(outgroup3_ch)

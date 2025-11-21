@@ -9,15 +9,15 @@ include { TABIX_TABIX as REHEADER_TABIX     } from '../../modules/nf-core/tabix/
 
 workflow VCF_EXTRACT {
     take:
-    ch_samplesheet          // Channel: vcf input prefix [ meta, vcf, index ]
-    samples_ch              // Channel: samples file [ meta, Path(samples) ]
+    ch_samplesheet          // channel: vcf input prefix [ meta, vcf, index ]
+    samples_ch              // channel: samples file [ meta, Path(samples) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // need to define a genome channel
-    genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
+    genome_ch = channel.fromPath(params.genome, checkIfExists: true)
         .map{ it -> [[ id: "${it.getBaseName()}" ], it]}
         // .view()
 
