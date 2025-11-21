@@ -34,7 +34,8 @@ workflow TREESEQ {
 
     ch_versions = Channel.empty()
 
-    // getting focal samples to keep (plink workflow)
+    // getting focal samples to keep (this is required to add pupulation information
+    // to treesequences output files)
     samples_ch = Channel.fromPath( params.sample2fid, checkIfExists: true )
 
     // need to define a genome channel

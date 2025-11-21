@@ -1,10 +1,10 @@
 //
 // extract samples from plink files and create a indexed VCF
 //
-include { PLINK_SUBSET                      } from '../../modules/local/plink/subset/main'
-include { PLINK_RECODE                      } from '../../modules/nf-core/plink/recode/main'
-include { BCFTOOLS_NORM                     } from '../../modules/nf-core/bcftools/norm/main'
-include { TABIX_TABIX as BCFTOOLS_TABIX     } from '../../modules/nf-core/tabix/tabix/main'
+include { PLINK_SUBSET as FOCAL_SUBSET      } from '../../modules/local/plink/subset/main'
+include { PLINK_RECODE as FOCAL_RECODE      } from '../../modules/nf-core/plink/recode/main'
+include { BCFTOOLS_NORM as FOCAL_NORM       } from '../../modules/nf-core/bcftools/norm/main'
+include { TABIX_TABIX as FOCAL_TABIX        } from '../../modules/nf-core/tabix/tabix/main'
 include { TABIX_TABIX as REHEADER_TABIX     } from '../../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_SPLIT as FOCAL_SPLIT     } from '../../modules/nf-core/bcftools/split/main'
 include { BEAGLE5_BEAGLE as FOCAL_BEAGLE    } from '../../modules/nf-core/beagle5/beagle/main'
@@ -41,26 +41,26 @@ workflow PLINK_EXTRACT {
         .set { plink_input_ch }
 
     // extract the samples I want. See modules.config for other options
-    PLINK_SUBSET(plink_input_ch, samples_ch)
-    ch_versions = ch_versions.mix(PLINK_SUBSET.out.versions)
+    FOCAL_SUBSET(plink_input_ch, samples_ch)
+    ch_versions = ch_versions.mix(FOCAL_SUBSET.out.versions)
 
     // transform the plink files to vcf
-    PLINK_RECODE(PLINK_SUBSET.out.bed.join(PLINK_SUBSET.out.bim).join(PLINK_SUBSET.out.fam))
-    ch_versions = ch_versions.mix(PLINK_RECODE.out.versions)
+    FOCAL_RECODE(FOCAL_SUBSET.out.bed.join(FOCAL_SUBSET.out.bim).join(FOCAL_SUBSET.out.fam))
+    ch_versions = ch_versions.mix(FOCAL_RECODE.out.versions)
 
     // Normalize focal VCF
-    BCFTOOLS_NORM(
-        PLINK_RECODE.out.vcfgz.map{ meta, vcf -> [meta, vcf, []] },
+    FOCAL_NORM(
+        FOCAL_RECODE.out.vcfgz.map{ meta, vcf -> [meta, vcf, []] },
         genome_ch
     )
-    ch_versions = ch_versions.mix(BCFTOOLS_NORM.out.versions)
+    ch_versions = ch_versions.mix(FOCAL_NORM.out.versions)
 
     // index focal vcf
-    BCFTOOLS_TABIX(BCFTOOLS_NORM.out.vcf)
-    ch_versions = ch_versions.mix(BCFTOOLS_TABIX.out.versions)
+    FOCAL_TABIX(FOCAL_NORM.out.vcf)
+    ch_versions = ch_versions.mix(FOCAL_TABIX.out.versions)
 
     // split data by chromosomes for focal
-    FOCAL_SPLIT(BCFTOOLS_NORM.out.vcf.join(BCFTOOLS_TABIX.out.tbi))
+    FOCAL_SPLIT(FOCAL_NORM.out.vcf.join(FOCAL_TABIX.out.tbi))
     ch_versions = ch_versions.mix(FOCAL_SPLIT.out.versions)
 
     // get the chromosome name from the vcf file name
