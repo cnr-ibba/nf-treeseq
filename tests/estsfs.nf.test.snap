@@ -19,7 +19,7 @@
                 "pipeline_info/nf-treeseq_software_versions.yml",
                 "tsinfer",
                 "tsinfer/test_dataset.focal.26.samples",
-                "tsinfer/test_dataset.focal.26.trees"
+                "tsinfer/test_dataset.focal.26.trees.tsz"
             ]
         ],
         "meta": {
