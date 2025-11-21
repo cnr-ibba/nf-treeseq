@@ -1,7 +1,7 @@
 //
 // extract samples from plink files and create a indexed VCF
 //
-include { PLINK_SUBSET                      } from '../../modules/local/plink_subset.nf'
+include { PLINK_SUBSET                      } from '../../modules/local/plink/subset/main'
 include { PLINK_RECODE                      } from '../../modules/nf-core/plink/recode/main'
 include { BCFTOOLS_NORM                     } from '../../modules/nf-core/bcftools/norm/main'
 include { TABIX_TABIX as BCFTOOLS_TABIX     } from '../../modules/nf-core/tabix/tabix/main'

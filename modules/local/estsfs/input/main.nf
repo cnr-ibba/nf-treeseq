@@ -3,7 +3,7 @@ process ESTSFS_INPUT {
     tag "$meta.id"
     label 'process_single'
 
-    container "docker.io/bunop/tskit:master"
+    container "docker.io/bunop/tskit:devel"
 
     input:
     tuple val(meta), path(vcf)
@@ -14,6 +14,7 @@ process ESTSFS_INPUT {
     tuple val(meta), path("*.txt"),     emit: input
     tuple val(meta), path("*.config"),  emit: config
     tuple val(meta), path("*.mapping"), emit: mapping
+    path "versions.yml",                emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,5 +34,10 @@ process ESTSFS_INPUT {
         --output_mapping ${prefix}.mapping \\
         --model ${model} \\
         --nrandom ${nrandom}
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        tskitetude: \$(pip show tskitetude | sed -n 's/^Version: //p')
+    END_VERSIONS
     """
 }

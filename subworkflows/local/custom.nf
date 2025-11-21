@@ -1,7 +1,7 @@
 //
 // call tsinfer using reference alleles as ancestral alleles
 //
-include { TSINFER_CUSTOM } from '../../modules/local/tsinfer_custom'
+include { TSINFER_CUSTOM } from '../../modules/local/tsinfer/custom/main'
 
 
 workflow CUSTOM {
@@ -20,6 +20,7 @@ workflow CUSTOM {
         samples_ch.first(),
         ancestor_ch.first()
     )
+    ch_versions = ch_versions.mix( TSINFER_CUSTOM.out.versions )
 
     emit:
 

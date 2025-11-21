@@ -1,7 +1,7 @@
 //
 // call tsinfer by setting ancestrall alleles as defined by est-sfs
 //
-include { PLINK_SUBSET as ANCIENT_SUBSET    } from '../../modules/local/plink_subset.nf'
+include { PLINK_SUBSET as ANCIENT_SUBSET    } from '../../modules/local/plink/subset/main'
 include { PLINK_RECODE as ANCIENT_RECODE    } from '../../modules/nf-core/plink/recode/main'
 include { BCFTOOLS_NORM as ANCIENT_NORM     } from '../../modules/nf-core/bcftools/norm/main'
 include { BCFTOOLS_SPLIT as ANCIENT_SPLIT   } from '../../modules/nf-core/bcftools/split/main'
@@ -9,10 +9,10 @@ include {
     TABIX_TABIX as ANCIENT_TABIX;
     TABIX_TABIX as ANCIENT_SPLIT_TABIX      } from '../../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_MERGE                    } from '../../modules/nf-core/bcftools/merge/main'
-include { ESTSFS_INPUT                      } from '../../modules/local/estsfs_input'
+include { ESTSFS_INPUT                      } from '../../modules/local/estsfs/input/main'
 include { ESTSFS                            } from '../../modules/cnr-ibba/estsfs/main'
-include { ESTSFS_OUTPUT                     } from '../../modules/local/estsfs_output'
-include { TSINFER_ESTSFS                    } from '../../modules/local/tsinfer_estsfs'
+include { ESTSFS_OUTPUT                     } from '../../modules/local/estsfs/output/main'
+include { TSINFER_ESTSFS                    } from '../../modules/local/tsinfer/estsfs/main'
 
 
 process GENERATE_SEED {
@@ -128,6 +128,7 @@ workflow EST_SFS {
         samples_ch.first(),
         outgroup_files_ch.collect()
     )
+    ch_versions = ch_versions.mix(ESTSFS_INPUT.out.versions)
 
     // determine a seedfile
     seedfile = GENERATE_SEED()
@@ -141,6 +142,7 @@ workflow EST_SFS {
     ch_versions = ch_versions.mix(ESTSFS.out.versions)
 
     ESTSFS_OUTPUT(ESTSFS_INPUT.out.mapping.join(ESTSFS.out.pvalues_out))
+    ch_versions = ch_versions.mix(ESTSFS_OUTPUT.out.versions)
 
     tsinfer_in_ch = focal_vcf_ch
         .map{ meta, vcf -> [meta.chrom, meta, vcf] }
@@ -160,6 +162,7 @@ workflow EST_SFS {
         tsinfer_in_ch,
         samples_ch.first()
     )
+    ch_versions = ch_versions.mix( TSINFER_ESTSFS.out.versions )
 
     emit:
 

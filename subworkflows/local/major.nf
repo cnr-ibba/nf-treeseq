@@ -1,7 +1,7 @@
 //
 // call tsinfer using major alleles as ancestral alleles
 //
-include { TSINFER_MAJOR } from '../../modules/local/tsinfer_major'
+include { TSINFER_MAJOR } from '../../modules/local/tsinfer/major/main'
 
 
 workflow MAJOR {
@@ -18,6 +18,7 @@ workflow MAJOR {
         focal_vcf_ch,
         samples_ch.first()
     )
+    ch_versions = ch_versions.mix( TSINFER_MAJOR.out.versions )
 
     emit:
     versions       = ch_versions                    // channel: [ versions.yml ]

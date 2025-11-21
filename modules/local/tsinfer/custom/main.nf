@@ -1,9 +1,9 @@
 
-process TSINFER_MAJOR {
+process TSINFER_CUSTOM {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/tskit:master"
+    container "docker.io/bunop/tskit:devel"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""
@@ -11,10 +11,12 @@ process TSINFER_MAJOR {
     input:
     tuple val(meta), path(vcf)
     path(sample_file)
+    path(ancestor_file)
 
     output:
     tuple val(meta), path("*.samples"),     emit: samples
     tuple val(meta), path("*.trees"),       emit: trees
+    path "versions.yml",                    emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -26,10 +28,19 @@ process TSINFER_MAJOR {
     create_tstree \\
         --vcf ${vcf} \\
         --focal ${sample_file} \\
-        --ancestral_as_major \\
+        --ancestral_ensembl ${ancestor_file} \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\
         $args
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        tskitetude: \$(pip show tskitetude | sed -n 's/^Version: //p')
+        tskit: \$(pip show tskit | sed -n 's/^Version: //p')
+        tsinfer: \$(pip show tsinfer | sed -n 's/^Version: //p')
+        tsdate: \$(pip show tsdate | sed -n 's/^Version: //p')
+        tszip: \$(pip show tszip | sed -n 's/^Version: //p')
+    END_VERSIONS
     """
 }

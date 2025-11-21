@@ -1,7 +1,7 @@
 //
 // call tsinfer using reference alleles as ancestral alleles
 //
-include { TSINFER_REFERENCE } from '../../modules/local/tsinfer_reference'
+include { TSINFER_REFERENCE } from '../../modules/local/tsinfer/reference/main'
 
 
 workflow REFERENCE {
@@ -18,6 +18,7 @@ workflow REFERENCE {
         focal_vcf_ch,
         samples_ch.first()
     )
+    ch_versions = ch_versions.mix( TSINFER_REFERENCE.out.versions )
 
     emit:
     versions       = ch_versions                    // channel: [ versions.yml ]
