@@ -1,17 +1,17 @@
 nextflow_pipeline {
 
-    name "Test pipeline with custom alleles as ancestors"
+    name "Test pipeline with VCF and reference alleles as ancestor alleles"
     script "../main.nf"
-    tag "pipeline"
-    tag "custom"
+    tag "vcf"
+    tag "reference"
 
     test("-profile test") {
 
         when {
             params {
+                plink_species = null
                 outdir = "$outputDir"
-                ancestor_method = 'custom'
-                ancestor_file = "${projectDir}/tests/test_ancestors.csv"
+                ancestor_method = 'reference'
             }
         }
 

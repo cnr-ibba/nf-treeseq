@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            22,
+            21,
             [
                 "estsfs",
                 "estsfs/samples-merged.26.ancestral.csv",
@@ -17,10 +17,9 @@
                 "focal/test_dataset.focal.26.vcf.gz.tbi",
                 "pipeline_info",
                 "pipeline_info/nf-treeseq_software_versions.yml",
-                "pipeline_info/software_versions.yml",
                 "tsinfer",
                 "tsinfer/test_dataset.focal.26.samples",
-                "tsinfer/test_dataset.focal.26.trees"
+                "tsinfer/test_dataset.focal.26.trees.tsz"
             ]
         ],
         "meta": {

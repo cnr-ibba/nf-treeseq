@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["outdir", "genome", "input"],
+            "required": ["input", "sample2fid", "outdir", "genome"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -21,6 +21,13 @@
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "sample2fid": {
+                    "type": "string",
+                    "description": "A TSV file with `FID` and `IID` columns indicating the samples to keep",
+                    "mimetype": "text/tsv",
+                    "format": "file-path",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -65,9 +72,6 @@
                     "format": "file-path",
                     "description": "Accessory file needed for some ancestor inference methods",
                     "help_text": "Required for methods: custom",
-                    "dependRequired": {
-                        "ancestor_method": ["custom"]
-                    },
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
                 }
@@ -106,12 +110,6 @@
                 "plink_species": {
                     "type": "string",
                     "description": "Species-specific options for PLINK (e.g., `--species sheep` or `--chr-set 26 no-xy no-mt --allow-no-sex`)"
-                },
-                "plink_keep": {
-                    "type": "string",
-                    "description": "A TSV file with `FID` and `IID` columns indicating the samples to keep",
-                    "mimetype": "text/tsv",
-                    "format": "file-path"
                 },
                 "plink_geno": {
                     "type": "number",

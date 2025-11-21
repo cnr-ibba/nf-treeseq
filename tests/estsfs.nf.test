@@ -8,6 +8,7 @@ nextflow_pipeline {
 
         when {
             params {
+                input ="${projectDir}/assets/samplesheet_plink.csv"
                 outdir = "$outputDir"
                 ancestor_method = 'est-sfs'
                 outgroup1 = "$projectDir/tests/test_outgroup.tsv"

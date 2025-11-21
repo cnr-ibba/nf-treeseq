@@ -38,7 +38,7 @@ workflow PIPELINE_INITIALISATION {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -75,15 +75,47 @@ workflow PIPELINE_INITIALISATION {
     )
 
     //
+    // Custom validation of parameters
+    //
+    // TODO: this option is plink specific for now
+    if (params.ancestor_method == 'est-sfs') {
+        if (!params.outgroup1) {
+            error "ERROR: 'outgroup1' is required (at least) when ancestor_method is 'est-sfs'"
+        }
+    }
+
+    if (params.ancestor_method == 'custom') {
+        if (!params.ancestor_file) {
+            error "ERROR: 'ancestor_file' is required when ancestor_method is 'custom'"
+        }
+    }
+
+    //
     // Create channel from input file provided through params.input
     //
 
-    Channel
+    channel
         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+        .branch { row ->
+            def meta = row[0]
+            def plink_bfile = row[1]
+            def vcf = row[2]
+            def index = row[3]
+
+            plink: plink_bfile && plink_bfile != [] && plink_bfile.toString() != ''
+                return [meta, plink_bfile]
+            vcf: vcf && vcf != [] && vcf.toString() != ''
+                return [meta, vcf, index]
+            invalid: true
+                // Catch-all for invalid entries
+                log.warn "Invalid entry: ${row}"
+                return null
+        }
         .set { ch_samplesheet }
 
     emit:
-    samplesheet = ch_samplesheet
+    samplesheet_plink = ch_samplesheet.plink
+    samplesheet_vcf = ch_samplesheet.vcf
     versions    = ch_versions
 }
 

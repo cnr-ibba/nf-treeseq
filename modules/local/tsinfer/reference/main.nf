@@ -3,7 +3,7 @@ process TSINFER_REFERENCE {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/tskit:master"
+    container "docker.io/bunop/tskit:devel"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""
@@ -14,7 +14,8 @@ process TSINFER_REFERENCE {
 
     output:
     tuple val(meta), path("*.samples"),     emit: samples
-    tuple val(meta), path("*.trees"),       emit: trees
+    tuple val(meta), path("*.trees.tsz"),   emit: trees
+    path "versions.yml",                    emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,6 +24,8 @@ process TSINFER_REFERENCE {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def args = task.ext.args ?: ''
     """
+    mkfifo ${prefix}.trees
+
     create_tstree \\
         --vcf ${vcf} \\
         --focal ${sample_file} \\
@@ -30,6 +33,16 @@ process TSINFER_REFERENCE {
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\
-        $args
+        $args &
+    tszip ${prefix}.trees
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        tskitetude: \$(pip show tskitetude | sed -n 's/^Version: //p')
+        tskit: \$(pip show tskit | sed -n 's/^Version: //p')
+        tsinfer: \$(pip show tsinfer | sed -n 's/^Version: //p')
+        tsdate: \$(pip show tsdate | sed -n 's/^Version: //p')
+        tszip: \$(pip show tszip | sed -n 's/^Version: //p')
+    END_VERSIONS
     """
 }

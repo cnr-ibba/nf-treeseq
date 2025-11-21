@@ -28,7 +28,8 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-t
 workflow CNRIBBA_TREESEQ {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    samplesheet_plink // channel: samplesheet for plink read in from --input
+    samplesheet_vcf // channel: samplesheet for vcf read in from --input
 
     main:
 
@@ -36,7 +37,8 @@ workflow CNRIBBA_TREESEQ {
     // WORKFLOW: Run pipeline
     //
     TREESEQ (
-        samplesheet
+        samplesheet_plink,
+        samplesheet_vcf
     )
 }
 /*
@@ -67,7 +69,8 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     CNRIBBA_TREESEQ (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet_plink,
+        PIPELINE_INITIALISATION.out.samplesheet_vcf
     )
     //
     // SUBWORKFLOW: Run completion tasks
