@@ -9,6 +9,7 @@ include { GAWK as MAKE_SHAPEIT                  } from '../../modules/nf-core/ga
 workflow THREADS {
     take:
     focal_vcf_ch        // channel: focal vcf file (phased) [ meta, Path(vcf), Path(tbi) ]
+    demography_ch       // channel: demography file [ Path(demography) ]
 
     main:
 

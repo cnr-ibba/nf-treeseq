@@ -11,6 +11,7 @@ nextflow_pipeline {
             params {
                 outdir = "$outputDir"
                 ancestor_method = 'threads'
+                demography_file = "tests/test_dataset.demo"
                 plink_species = "--chr-set 26 no-xy no-mt --allow-no-sex"
             }
         }

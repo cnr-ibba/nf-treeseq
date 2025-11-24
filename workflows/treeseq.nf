@@ -89,8 +89,13 @@ workflow TREESEQ {
             )
             ch_versions = ch_versions.mix(CUSTOM.out.versions)
         } else if (params.ancestor_method == 'threads') {
+            // call tsinfer using https://palamaralab.github.io/software/threads/
+            // open demography file:
+            demography_ch = channel.fromPath( params.demography_file, checkIfExists: true )
+
             THREADS(
-                VCF_EXTRACT.out.vcf.join(VCF_EXTRACT.out.tbi)
+                VCF_EXTRACT.out.vcf.join(VCF_EXTRACT.out.tbi),
+                demography_ch
             )
             ch_versions = ch_versions.mix(THREADS.out.versions)
         }

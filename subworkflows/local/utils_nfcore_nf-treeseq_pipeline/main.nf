@@ -90,6 +90,12 @@ workflow PIPELINE_INITIALISATION {
         }
     }
 
+    if (params.ancestor_method == 'threads') {
+        if (!params.demography_file) {
+            error "ERROR: 'demography_file' is required when ancestor_method is 'threads'"
+        }
+    }
+
     //
     // Create channel from input file provided through params.input
     //
