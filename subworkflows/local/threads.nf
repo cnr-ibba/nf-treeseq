@@ -3,6 +3,7 @@
 //
 include { BCFTOOLS_VIEW as BCFTOOLS_BIALLELIC   } from '../../modules/nf-core/bcftools/view/main'
 include { PLINK2_VCF                            } from '../../modules/nf-core/plink2/vcf/main'
+include { GAWK as MAKE_SHAPEIT                  } from '../../modules/nf-core/gawk/main'
 
 
 workflow THREADS {
@@ -25,6 +26,13 @@ workflow THREADS {
     // call plink2 to create pgen/psam/pvar files
     PLINK2_VCF(
         BCFTOOLS_BIALLELIC.out.vcf
+    )
+
+    // call gawk to create shapeit format files
+    MAKE_SHAPEIT(
+        PLINK2_VCF.out.pvar,
+        [],
+        false
     )
 
     emit:
