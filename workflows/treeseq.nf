@@ -12,6 +12,7 @@ include { EST_SFS                           } from '../subworkflows/local/est_sf
 include { REFERENCE                         } from '../subworkflows/local/reference'
 include { MAJOR                             } from '../subworkflows/local/major'
 include { CUSTOM                            } from '../subworkflows/local/custom'
+include { THREADS                           } from '../subworkflows/local/threads'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,7 +88,13 @@ workflow TREESEQ {
                 ancestor_ch
             )
             ch_versions = ch_versions.mix(CUSTOM.out.versions)
-        } else {
+        } else if (params.ancestor_method == 'threads') {
+            THREADS(
+                VCF_EXTRACT.out.vcf.join(VCF_EXTRACT.out.tbi)
+            )
+            ch_versions = ch_versions.mix(THREADS.out.versions)
+        }
+        else {
             error("No valid ancestral allele option provided")
         }
     }
