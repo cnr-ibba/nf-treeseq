@@ -5,4 +5,4 @@ channels:
   - bioconda
 dependencies:
   - pip:
-    - threads-arg==0.2.1
+      - threads-arg==0.2.1
