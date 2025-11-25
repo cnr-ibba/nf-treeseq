@@ -4,6 +4,7 @@
 # AUTHOR:         Paolo Cozzi <paolo.cozzi@ibba.cnr.it>
 # DESCRIPTION:    A custom image with threads_arg installed
 # TO_BUILD:       docker build --rm -t bunop/threads_arg .
+# WITH_WAVE:      wave --containerfile Dockerfile --freeze --build-repo docker.io/bunop/threads_arg --await
 # TO_RUN:         docker run --rm -ti bunop/threads_arg bash
 # TO_TAG:         docker tag bunop/threads_arg:latest bunop/threads_arg:0.2.1
 #
