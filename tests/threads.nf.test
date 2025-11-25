@@ -13,6 +13,7 @@ nextflow_pipeline {
                 ancestor_method = 'threads'
                 demography_file = "tests/test_dataset.demo"
                 plink_species = "--chr-set 26 no-xy no-mt --allow-no-sex"
+                threads_query_interval = 0.005
             }
         }
 

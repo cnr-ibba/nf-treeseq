@@ -108,6 +108,24 @@
                 }
             }
         },
+        "threads": {
+            "title": "THREADS",
+            "type": "object",
+            "description": "Threads options",
+            "default": "",
+            "properties": {
+                "threads_mutation_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "The estimated mutation rate per unit of genome per unit time for THREADS"
+                },
+                "threads_query_interval": {
+                    "type": "number",
+                    "default": 0.01,
+                    "description": "Hyperparameter for the preliminary haplotype matching in cM"
+                }
+            }
+        },
         "plink": {
             "title": "PLINK",
             "type": "object",
@@ -295,6 +313,9 @@
         },
         {
             "$ref": "#/$defs/tsdate"
+        },
+        {
+            "$ref": "#/$defs/threads"
         },
         {
             "$ref": "#/$defs/plink"

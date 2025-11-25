@@ -19,6 +19,7 @@ ENV \
 # update packages and install threads_arg
 RUN apt-get update && \
     apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends procps && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir --upgrade pip && \
