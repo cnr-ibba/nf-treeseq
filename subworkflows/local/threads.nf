@@ -5,6 +5,7 @@ include { BCFTOOLS_VIEW as BCFTOOLS_BIALLELIC   } from '../../modules/nf-core/bc
 include { PLINK2_VCF                            } from '../../modules/nf-core/plink2/vcf/main'
 include { GAWK as MAKE_SHAPEIT                  } from '../../modules/nf-core/gawk/main'
 include { THREADS_INFER                         } from '../../modules/local/threads_arg/infer/main'
+include { THREADS_CONVERT                       } from '../../modules/local/threads_arg/convert/main'
 
 
 workflow THREADS {
@@ -48,6 +49,12 @@ workflow THREADS {
         demography_ch
     )
     ch_versions = ch_versions.mix( THREADS_INFER.out.versions )
+
+    // packing outputs in tree sequence format (compressed)
+    THREADS_CONVERT(
+        THREADS_INFER.out.threads
+    )
+    ch_versions = ch_versions.mix( THREADS_CONVERT.out.versions )
 
     emit:
     versions       = ch_versions                    // channel: [ versions.yml ]
