@@ -65,7 +65,7 @@
                     "description": "How the ancestral allele is determined",
                     "enum": ["est-sfs", "custom", "reference", "major", "threads"],
                     "default": "reference",
-                    "help_text": "How the ancestral allele is determined: 'est-sfs' uses outgroup samples and the est-sfs program to infer the ancestral allele; 'custom' uses a custom TSV file; 'reference' uses the reference genome allele as ancestral; 'major' uses the major allele as ancestral. 'threads' uses the palamaralab threads software (https://palamaralab.github.io/software/threads/) to create treesequences directly from genotype data."
+                    "help_text": "How the ancestral allele is determined: 'est-sfs' uses outgroup samples and the est-sfs program to infer the ancestral allele; 'custom' uses a custom TSV file; 'reference' uses the reference genome allele as ancestral; 'major' uses the major allele as ancestral. 'threads' uses the palamaralab threads software (https://palamaralab.github.io/software/threads/) to create tree sequences directly from genotype data."
                 },
                 "ancestor_file": {
                     "type": "string",
