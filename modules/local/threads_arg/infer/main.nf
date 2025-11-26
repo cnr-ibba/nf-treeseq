@@ -3,8 +3,7 @@ process THREADS_INFER {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "${moduleDir}/environment.yml"
-    container "docker.io/bunop/threads_arg:1da6fb667475be60"
+    container "docker.io/bunop/threads_arg:894177275e63d259"
 
     input:
     tuple val(meta), path(pgen), path(psam), path(pvar), path(map)

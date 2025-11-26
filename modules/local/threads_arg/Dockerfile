@@ -1,5 +1,5 @@
 #
-# VERSION 0.2.1
+# VERSION 0.2.1-hotfix
 # DOCKER-VERSION  27.3.1
 # AUTHOR:         Paolo Cozzi <paolo.cozzi@ibba.cnr.it>
 # DESCRIPTION:    A custom image with threads_arg installed
@@ -20,8 +20,12 @@ ENV \
 # update packages and install threads_arg
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends procps && \
+    apt-get install -y --no-install-recommends \
+        procps \
+        git \
+        build-essential \
+        libboost-all-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir threads-arg==0.2.1
+    pip install --no-cache-dir git+https://github.com/bunop/threads.git@v0.2.1-hotfix
