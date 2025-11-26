@@ -36,7 +36,7 @@ workflow THREADS {
         PLINK2_VCF.out.pgen
             .join(PLINK2_VCF.out.psam)
             .join(PLINK2_VCF.out.pvar),
-        demography_ch
+        demography_ch.first()
     )
     ch_versions = ch_versions.mix( THREADS_INFER.out.versions )
 
