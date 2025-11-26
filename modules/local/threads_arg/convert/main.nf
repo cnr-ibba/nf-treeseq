@@ -37,6 +37,8 @@ process THREADS_CONVERT {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    echo $args
+
     touch ${prefix}.tsz
 
     cat <<-END_VERSIONS > versions.yml

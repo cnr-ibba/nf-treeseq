@@ -4,7 +4,7 @@ process TSINFER_CUSTOM {
     label 'process_medium'
     label 'process_long'
 
-    container "docker.io/bunop/tskit:devel"
+    container "docker.io/bunop/tskit:0.5.1"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""
