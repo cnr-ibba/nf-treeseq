@@ -3,7 +3,7 @@ process THREADS_INFER {
     tag "$meta.id"
     label 'process_medium'
 
-    container "docker.io/bunop/threads_arg:894177275e63d259"
+    container "docker.io/bunop/threads_arg:03e31e528ad47bd9"
 
     input:
     tuple val(meta), path(pgen), path(psam), path(pvar), path(map)

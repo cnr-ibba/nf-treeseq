@@ -3,7 +3,7 @@ process THREADS_CONVERT {
     tag "$meta.id"
     label 'process_single'
 
-    container "docker.io/bunop/threads_arg:894177275e63d259"
+    container "docker.io/bunop/threads_arg:03e31e528ad47bd9"
 
     input:
     tuple val(meta), path(threads)
