@@ -6,7 +6,7 @@ process THREADS_INFER {
     container "docker.io/bunop/threads_arg:03e31e528ad47bd9"
 
     input:
-    tuple val(meta), path(pgen), path(psam), path(pvar), path(map)
+    tuple val(meta), path(pgen), path(psam), path(pvar)
     path(demography)
 
     output:
@@ -27,7 +27,6 @@ process THREADS_INFER {
         $args \\
         --num_threads $task.cpus \\
         --pgen $pgen \\
-        --map $map \\
         --demography $demography \\
         --mutation_rate ${params.threads_mutation_rate} \\
         --query_interval ${params.threads_query_interval} \\
