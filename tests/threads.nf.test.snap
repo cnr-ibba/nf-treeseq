@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            10,
+            9,
             [
                 "focal",
                 "focal/test.26.vcf.gz",
@@ -16,6 +16,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-25T15:22:08.00779344"
+        "timestamp": "2025-11-26T15:50:37.017433857"
     }
 }
