@@ -170,18 +170,15 @@ Create a file named `params.json` with at minimum the following required paramet
 #### Core Parameters Explained:
 
 - **`plink_species`** (required): Species-specific PLINK options
-
   - For standard human data: `"--species human"` or leave empty
   - For non-model organisms: `"--chr-set <N> no-xy no-mt --allow-no-sex"` where `<N>` is the number of autosomes
   - Example for sheep (26 autosomes): `"--chr-set 26 no-xy no-mt --allow-no-sex"`
 
 - **`genome`** (required): Reference genome FASTA file for variant normalization
-
   - Can be compressed (`.fasta.gz`) or uncompressed (`.fasta`)
   - Must match the genome build used for genotyping
 
 - **`ancestor_method`** (required): Method for determining ancestral alleles
-
   - Options: `"reference"` (default), `"major"`, `"est-sfs"`, or `"custom"`
   - See [Specifying Ancestral Alleles](#specifying-ancestral-alleles) section below
 
