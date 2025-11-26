@@ -28,6 +28,7 @@ process THREADS_INFER {
         --num_threads $task.cpus \\
         --pgen $pgen \\
         --demography $demography \\
+        --recombination_rate ${params.threads_recombination_rate} \\
         --mutation_rate ${params.threads_mutation_rate} \\
         --query_interval ${params.threads_query_interval} \\
         --out ${prefix}.threads
