@@ -31,6 +31,8 @@ process THREADS_INFER {
         --recombination_rate ${params.recombination_rate} \\
         --mutation_rate ${params.mutation_rate} \\
         --query_interval ${params.threads_query_interval} \\
+        --fit_to_data \\
+        --save_metadata \\
         --out ${prefix}.threads
 
     cat <<-END_VERSIONS > versions.yml

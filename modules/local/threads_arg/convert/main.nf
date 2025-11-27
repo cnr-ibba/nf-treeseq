@@ -9,7 +9,7 @@ process THREADS_CONVERT {
     tuple val(meta), path(threads)
 
     output:
-    tuple val(meta), path("*.tsz"), emit: threads
+    tuple val(meta), path("*.tsz"), emit: tree
     path "versions.yml", emit: versions
 
     when:
@@ -24,6 +24,7 @@ process THREADS_CONVERT {
     threads \\
         convert \\
         $args \\
+        --add_mutations \\
         --threads ${threads} \\
         --tsz ${prefix}.tsz
 
