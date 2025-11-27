@@ -58,7 +58,7 @@
             "title": "Ancestor configuration",
             "type": "object",
             "description": "The source of ancestor evidence",
-            "default": "",
+            "required": ["ancestor_method", "mutation_rate"],
             "properties": {
                 "ancestor_method": {
                     "type": "string",
@@ -81,6 +81,16 @@
                     "description": "Demography file for threads method",
                     "help_text": "Required for method: threads",
                     "mimetype": "text/tsv"
+                },
+                "mutation_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "The estimated mutation rate per unit of genome per unit time"
+                },
+                "recombination_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "Genome-wide recombination rate"
                 }
             }
         },
@@ -90,11 +100,6 @@
             "description": "ts-date option groups",
             "default": "",
             "properties": {
-                "tsdate_mutation_rate": {
-                    "type": "number",
-                    "default": 1e-8,
-                    "description": "The estimated mutation rate per unit of genome per unit time"
-                },
                 "tsdate_ne": {
                     "type": "integer",
                     "default": 10000,
@@ -114,20 +119,10 @@
             "description": "Threads options",
             "default": "",
             "properties": {
-                "threads_recombination_rate": {
-                    "type": "number",
-                    "default": 1.3e-8,
-                    "description": "Genome-wide recombination rate. Ignored if a map is passed"
-                },
                 "threads_query_interval": {
                     "type": "number",
                     "default": 0.01,
                     "description": "Hyperparameter for the preliminary haplotype matching in cM"
-                },
-                "threads_mutation_rate": {
-                    "type": "number",
-                    "default": 1.4e-8,
-                    "description": "The estimated mutation rate per unit of genome per unit time for THREADS"
                 }
             }
         },
