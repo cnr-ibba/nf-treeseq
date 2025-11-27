@@ -1,0 +1,21 @@
+{
+    "-profile test": {
+        "content": [
+            9,
+            [
+                "focal",
+                "focal/test.26.vcf.gz",
+                "focal/test.26.vcf.gz.tbi",
+                "pipeline_info",
+                "pipeline_info/nf-treeseq_software_versions.yml",
+                "threads",
+                "threads/test.26.tsz"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-26T15:50:37.017433857"
+    }
+}

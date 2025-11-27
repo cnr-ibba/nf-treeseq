@@ -63,9 +63,9 @@
                 "ancestor_method": {
                     "type": "string",
                     "description": "How the ancestral allele is determined",
-                    "enum": ["est-sfs", "custom", "reference", "major"],
+                    "enum": ["est-sfs", "custom", "reference", "major", "threads"],
                     "default": "reference",
-                    "help_text": "How the ancestral allele is determined: 'est-sfs' uses outgroup samples and the est-sfs program to infer the ancestral allele; 'custom' uses a custom TSV file; 'reference' uses the reference genome allele as ancestral; 'major' uses the major allele as ancestral."
+                    "help_text": "How the ancestral allele is determined: 'est-sfs' uses outgroup samples and the est-sfs program to infer the ancestral allele; 'custom' uses a custom TSV file; 'reference' uses the reference genome allele as ancestral; 'major' uses the major allele as ancestral. 'threads' uses the palamaralab threads software (https://palamaralab.github.io/software/threads/) to create tree sequences directly from genotype data."
                 },
                 "ancestor_file": {
                     "type": "string",
@@ -74,6 +74,13 @@
                     "help_text": "Required for methods: custom",
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
+                },
+                "demography_file": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Demography file for threads method",
+                    "help_text": "Required for method: threads",
+                    "mimetype": "text/tsv"
                 }
             }
         },
@@ -98,6 +105,29 @@
                     "default": "variational_gamma",
                     "description": "TsDate method: should be one of \"inside_outside\", \"variational_gamma\" or  \"maximization\"",
                     "enum": ["inside_outside", "variational_gamma", "maximization"]
+                }
+            }
+        },
+        "threads": {
+            "title": "THREADS",
+            "type": "object",
+            "description": "Threads options",
+            "default": "",
+            "properties": {
+                "threads_recombination_rate": {
+                    "type": "number",
+                    "default": 1.3e-8,
+                    "description": "Genome-wide recombination rate. Ignored if a map is passed"
+                },
+                "threads_query_interval": {
+                    "type": "number",
+                    "default": 0.01,
+                    "description": "Hyperparameter for the preliminary haplotype matching in cM"
+                },
+                "threads_mutation_rate": {
+                    "type": "number",
+                    "default": 1.4e-8,
+                    "description": "The estimated mutation rate per unit of genome per unit time for THREADS"
                 }
             }
         },
@@ -288,6 +318,9 @@
         },
         {
             "$ref": "#/$defs/tsdate"
+        },
+        {
+            "$ref": "#/$defs/threads"
         },
         {
             "$ref": "#/$defs/plink"
