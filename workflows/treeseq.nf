@@ -95,7 +95,8 @@ workflow TREESEQ {
 
             THREADS(
                 VCF_EXTRACT.out.vcf.join(VCF_EXTRACT.out.tbi),
-                demography_ch
+                demography_ch,
+                samples_ch
             )
             ch_versions = ch_versions.mix(THREADS.out.versions)
         } else {

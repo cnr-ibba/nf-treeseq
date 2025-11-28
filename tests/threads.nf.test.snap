@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            9,
+            10,
             [
                 "focal",
                 "focal/test.26.vcf.gz",
@@ -9,7 +9,7 @@
                 "pipeline_info",
                 "pipeline_info/nf-treeseq_software_versions.yml",
                 "threads",
-                "threads/test.26.tsz"
+                "threads/test.26.trees.tsz"
             ]
         ],
         "meta": {
