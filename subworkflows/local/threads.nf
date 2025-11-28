@@ -59,12 +59,12 @@ workflow THREADS {
             def yaml = new org.yaml.snakeyaml.Yaml()
             def versions = yaml.load(version_file.text)
 
-            // Cerca la chiave che contiene "THREADS"
+            // Find the key that contains "THREADS"
             def threads_key = versions.keySet().find { it.contains('THREADS') }
 
             if (threads_key) {
                 def threads_data = versions[threads_key]
-                // Estrai il valore di "threads"
+                // Extract the "threads" value
                 return threads_data['threads'] ?: 'unknown'
             }
 
@@ -72,9 +72,9 @@ workflow THREADS {
         }
         // .view { "Threads version: ${it}" }
 
-    // create a metadata (value) channel with threads version
+    // create a metadata (value) channel with threads version as a tuple
     ch_metadata = ch_threads_version.map { version ->
-        [tool: 'threads', version: version]
+        ['threads', version]
     }
 
     // annotate tree sequence with sample metadata
