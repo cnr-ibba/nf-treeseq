@@ -79,7 +79,7 @@ workflow THREADS {
 
     // annotate tree sequence with sample metadata
     THREADS_ANNOTATE(
-        THREADS_CONVERT.out.tree,
+        BCFTOOLS_BIALLELIC.out.vcf.join(THREADS_CONVERT.out.tree),
         samples_ch.first(),
         ch_metadata
     )

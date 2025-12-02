@@ -9,7 +9,7 @@ process TSKIT_ANNOTATE {
         "--volume \${HOME}/.cache/:/.cache/" }"""
 
     input:
-    tuple val(meta), path(tree)
+    tuple val(meta), path(vcf), path(tree)
     path(sample_file)
     tuple val(software_name), val(software_version)
 
@@ -26,6 +26,7 @@ process TSKIT_ANNOTATE {
     """
     annotate_tree \\
         --input_tsz ${tree} \\
+        --input_vcf ${vcf} \\
         --sample_file ${sample_file} \\
         --output_tsz ${prefix}.tsz \\
         --software_name ${software_name} \\
