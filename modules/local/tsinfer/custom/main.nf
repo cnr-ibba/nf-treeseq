@@ -42,6 +42,7 @@ process TSINFER_CUSTOM {
         --focal ${sample_file} \\
         --ancestral_ensembl ${ancestor_file} \\
         --mutation_rate ${params.mutation_rate} \\
+        --recombination_rate ${params.recombination_rate} \\
         --ne ${params.tsdate_ne} \\
         --tsdate_method ${params.tsdate_method} \\
         --output_samples ${prefix}.samples \\
