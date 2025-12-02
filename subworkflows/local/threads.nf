@@ -51,7 +51,7 @@ workflow THREADS {
     ch_threads_version = ch_versions
         .filter { version_file ->
             def content = version_file.text
-            content.contains('"threads"') || content.contains('threads:')
+            content.contains('"threads-arg"') || content.contains('threads-arg:')
         }
         .first()
         .map { version_file ->
@@ -59,13 +59,13 @@ workflow THREADS {
             def yaml = new org.yaml.snakeyaml.Yaml()
             def versions = yaml.load(version_file.text)
 
-            // Find the key that contains "THREADS"
-            def threads_key = versions.keySet().find { it.contains('THREADS') }
+            // Find the key that contains "THREADS_INFER"
+            def threads_key = versions.keySet().find { it.contains('THREADS_INFER') }
 
             if (threads_key) {
                 def threads_data = versions[threads_key]
-                // Extract the "threads" value
-                return threads_data['threads'] ?: 'unknown'
+                // Extract the "threads-arg" value
+                return threads_data['threads-arg'] ?: 'unknown'
             }
 
             return 'unknown'

@@ -19,8 +19,6 @@ process THREADS_INFER {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
-    def VERSION = "0.2.1"
     """
     threads \\
         infer \\
@@ -37,7 +35,7 @@ process THREADS_INFER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: ${VERSION}
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 
@@ -51,7 +49,7 @@ process THREADS_INFER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: 0.2.1
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 }
