@@ -3,7 +3,7 @@ process TSKIT_ANNOTATE {
     tag "$meta.id"
     label 'process_single'
 
-    container "docker.io/bunop/tskit:fc4ae9345d625e66"
+    container "docker.io/bunop/tskit:7fe0ea482d8c3d98"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""

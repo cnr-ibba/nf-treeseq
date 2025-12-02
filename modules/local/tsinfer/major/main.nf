@@ -4,7 +4,7 @@ process TSINFER_MAJOR {
     label 'process_medium'
     label 'process_long'
 
-    container "docker.io/bunop/tskit:fc4ae9345d625e66"
+    container "docker.io/bunop/tskit:7fe0ea482d8c3d98"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""

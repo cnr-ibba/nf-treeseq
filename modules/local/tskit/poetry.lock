@@ -1051,8 +1051,8 @@ tszip = "^0.2.6"
 [package.source]
 type = "git"
 url = "https://github.com/bunop/TSKITetude.git"
-reference = "1f57461"
-resolved_reference = "1f57461073023b1c7ba4a77b887bc611a887ad93"
+reference = "e5a9f3c27fad0fb2291de4666cfcf14b6cc6d5a9"
+resolved_reference = "e5a9f3c27fad0fb2291de4666cfcf14b6cc6d5a9"
 
 [[package]]
 name = "tszip"
@@ -1116,4 +1116,4 @@ jupyter = ["ipytree (>=0.2.2)", "ipywidgets (>=8.0.0)", "notebook"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "05b6f11ebddfca07f28387ae74440342a114e51d31d0e8e7235134fd7bd9c2d4"
+content-hash = "cc23a791c6f455f2748351b2e9f000227baa6eaf8f91db49726c4da4667aebd2"
