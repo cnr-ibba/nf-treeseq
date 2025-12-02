@@ -24,7 +24,7 @@ process TSKIT_ANNOTATE {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}.trees"
     """
-    annotate_tree.py \\
+    annotate_tree \\
         --input_tsz ${tree} \\
         --sample_file ${sample_file} \\
         --output_tsz ${prefix}.tsz \\
