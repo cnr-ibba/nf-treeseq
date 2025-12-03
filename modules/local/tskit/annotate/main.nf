@@ -35,6 +35,7 @@ process TSKIT_ANNOTATE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
+        tskitetude: \$(pip show tskitetude | sed -n 's/^Version: //p')
         tskit: \$(pip show tskit | sed -n 's/^Version: //p')
         tszip: \$(pip show tszip | sed -n 's/^Version: //p')
     END_VERSIONS
