@@ -1,7 +1,8 @@
 
 process THREADS_INFER {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     container "docker.io/bunop/threads_arg:03e31e528ad47bd9"
 
