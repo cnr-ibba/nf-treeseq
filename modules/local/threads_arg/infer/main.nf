@@ -20,6 +20,7 @@ process THREADS_INFER {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def fit_to_data = params.threads_fit_to_data ? '--fit_to_data' : ''
     """
     threads \\
         infer \\
@@ -31,7 +32,7 @@ process THREADS_INFER {
         --mutation_rate ${params.mutation_rate} \\
         --query_interval ${params.threads_query_interval} \\
         --mode ${params.threads_mode} \\
-        --fit_to_data \\
+        $fit_to_data \\
         --save_metadata \\
         --out ${prefix}.threads
 

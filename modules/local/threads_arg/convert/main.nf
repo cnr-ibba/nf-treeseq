@@ -18,11 +18,12 @@ process THREADS_CONVERT {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def add_mutations = params.threads_fit_to_data ? '--add_mutations' : ''
     """
     threads \\
         convert \\
         $args \\
-        --add_mutations \\
+        $add_mutations \\
         --threads ${threads} \\
         --tsz ${prefix}.tsz
 

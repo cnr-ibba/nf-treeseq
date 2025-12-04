@@ -119,6 +119,11 @@
                     "help_text": "Required for method: threads",
                     "mimetype": "text/tsv"
                 },
+                "threads_fit_to_data": {
+                    "type": "boolean",
+                    "description": "Whether to fit the model to the data",
+                    "help_text": "If specified, Threads performs a post-processing step to ensure the inferred ARG contains an edge matching each input mutation."
+                },
                 "threads_query_interval": {
                     "type": "number",
                     "default": 0.01,
