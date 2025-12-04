@@ -11,7 +11,7 @@ nextflow_pipeline {
             params {
                 outdir = "$outputDir"
                 ancestor_method = 'threads'
-                demography_file = "${projectDir}/tests/test_dataset.demo"
+                threads_demography_file = "${projectDir}/tests/test_dataset.demo"
                 plink_species = "--chr-set 26 no-xy no-mt --allow-no-sex"
                 threads_query_interval = 0.005
             }

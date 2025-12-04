@@ -75,13 +75,6 @@
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
                 },
-                "demography_file": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Demography file for threads method",
-                    "help_text": "Required for method: threads",
-                    "mimetype": "text/tsv"
-                },
                 "mutation_rate": {
                     "type": "number",
                     "default": 1e-8,
@@ -119,6 +112,13 @@
             "description": "Threads options",
             "default": "",
             "properties": {
+                "threads_demography_file": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Demography file for threads method",
+                    "help_text": "Required for method: threads",
+                    "mimetype": "text/tsv"
+                },
                 "threads_query_interval": {
                     "type": "number",
                     "default": 0.01,
