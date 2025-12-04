@@ -123,6 +123,12 @@
                     "type": "number",
                     "default": 0.01,
                     "description": "Hyperparameter for the preliminary haplotype matching in cM"
+                },
+                "threads_mode": {
+                    "type": "string",
+                    "default": "wgs",
+                    "description": "Inference mode: should be one of \"wgs\" or \"array\"",
+                    "enum": ["wgs", "array"]
                 }
             }
         },

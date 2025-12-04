@@ -30,6 +30,7 @@ process THREADS_INFER {
         --recombination_rate ${params.recombination_rate} \\
         --mutation_rate ${params.mutation_rate} \\
         --query_interval ${params.threads_query_interval} \\
+        --mode ${params.threads_mode} \\
         --fit_to_data \\
         --save_metadata \\
         --out ${prefix}.threads
