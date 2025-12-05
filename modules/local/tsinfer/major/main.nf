@@ -40,10 +40,10 @@ process TSINFER_MAJOR {
         --vcf ${vcf} \\
         --focal ${sample_file} \\
         --ancestral_as_major \\
-        --mutation_rate ${params.mutation_rate} \\
-        --recombination_rate ${params.recombination_rate} \\
-        --ne ${params.tsdate_ne} \\
-        --tsdate_method ${params.tsdate_method} \\
+        --mutation_rate "${params.mutation_rate}" \\
+        --recombination_rate "${params.recombination_rate}" \\
+        --ne "${params.tsdate_ne}" \\
+        --tsdate_method "${params.tsdate_method}" \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\
