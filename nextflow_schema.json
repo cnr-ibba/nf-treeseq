@@ -58,7 +58,7 @@
             "title": "Ancestor configuration",
             "type": "object",
             "description": "The source of ancestor evidence",
-            "required": ["ancestor_method", "mutation_rate"],
+            "required": ["ancestor_method"],
             "properties": {
                 "ancestor_method": {
                     "type": "string",
