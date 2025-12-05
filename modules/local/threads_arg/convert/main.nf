@@ -9,7 +9,7 @@ process THREADS_CONVERT {
     tuple val(meta), path(threads)
 
     output:
-    tuple val(meta), path("*.tsz"), emit: threads
+    tuple val(meta), path("*.tsz"), emit: tree
     path "versions.yml", emit: versions
 
     when:
@@ -18,18 +18,18 @@ process THREADS_CONVERT {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
-    def VERSION = "0.2.1"
+    def add_mutations = params.threads_fit_to_data ? '--add_mutations' : ''
     """
     threads \\
         convert \\
         $args \\
+        $add_mutations \\
         --threads ${threads} \\
         --tsz ${prefix}.tsz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: ${VERSION}
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 
@@ -43,7 +43,7 @@ process THREADS_CONVERT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: 0.2.1
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 }

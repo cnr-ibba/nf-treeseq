@@ -4,7 +4,7 @@ process TSINFER_REFERENCE {
     label 'process_medium'
     label 'process_long'
 
-    container "docker.io/bunop/tskit:0.5.1"
+    container "docker.io/bunop/tskit:7fe0ea482d8c3d98"
     containerOptions """${ workflow.containerEngine == 'singularity' ?
         "--bind \${HOME}/.cache/" :
         "--volume \${HOME}/.cache/:/.cache/" }"""
@@ -40,6 +40,10 @@ process TSINFER_REFERENCE {
         --vcf ${vcf} \\
         --focal ${sample_file} \\
         --ancestral_as_reference \\
+        --mutation_rate "${params.mutation_rate}" \\
+        --recombination_rate "${params.recombination_rate}" \\
+        --ne "${params.tsdate_ne}" \\
+        --tsdate_method "${params.tsdate_method}" \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
         --num_threads $task.cpus \\

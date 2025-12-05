@@ -1,7 +1,8 @@
 
 process THREADS_INFER {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     container "docker.io/bunop/threads_arg:03e31e528ad47bd9"
 
@@ -19,8 +20,7 @@ process THREADS_INFER {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
-    def VERSION = "0.2.1"
+    def fit_to_data = params.threads_fit_to_data ? '--fit_to_data' : ''
     """
     threads \\
         infer \\
@@ -28,14 +28,17 @@ process THREADS_INFER {
         --num_threads $task.cpus \\
         --pgen $pgen \\
         --demography $demography \\
-        --recombination_rate ${params.threads_recombination_rate} \\
-        --mutation_rate ${params.threads_mutation_rate} \\
-        --query_interval ${params.threads_query_interval} \\
+        --recombination_rate "${params.recombination_rate}" \\
+        --mutation_rate "${params.mutation_rate}" \\
+        --query_interval "${params.threads_query_interval}" \\
+        --mode "${params.threads_mode}" \\
+        $fit_to_data \\
+        --save_metadata \\
         --out ${prefix}.threads
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: ${VERSION}
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 
@@ -49,7 +52,7 @@ process THREADS_INFER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        threads: 0.2.1
+        threads-arg: \$(pip show threads-arg | sed -n 's/^Version: //p')
     END_VERSIONS
     """
 }

@@ -58,7 +58,7 @@
             "title": "Ancestor configuration",
             "type": "object",
             "description": "The source of ancestor evidence",
-            "default": "",
+            "required": ["ancestor_method"],
             "properties": {
                 "ancestor_method": {
                     "type": "string",
@@ -75,12 +75,15 @@
                     "mimetype": "text/csv",
                     "schema": "assets/ancestor_file_schema.json"
                 },
-                "demography_file": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Demography file for threads method",
-                    "help_text": "Required for method: threads",
-                    "mimetype": "text/tsv"
+                "mutation_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "The estimated mutation rate per unit of genome per unit time"
+                },
+                "recombination_rate": {
+                    "type": "number",
+                    "default": 1e-8,
+                    "description": "Genome-wide recombination rate"
                 }
             }
         },
@@ -90,11 +93,6 @@
             "description": "ts-date option groups",
             "default": "",
             "properties": {
-                "tsdate_mutation_rate": {
-                    "type": "number",
-                    "default": 1e-8,
-                    "description": "The estimated mutation rate per unit of genome per unit time"
-                },
                 "tsdate_ne": {
                     "type": "integer",
                     "default": 10000,
@@ -114,20 +112,28 @@
             "description": "Threads options",
             "default": "",
             "properties": {
-                "threads_recombination_rate": {
-                    "type": "number",
-                    "default": 1.3e-8,
-                    "description": "Genome-wide recombination rate. Ignored if a map is passed"
+                "threads_demography_file": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Demography file for threads method",
+                    "help_text": "Required for method: threads",
+                    "mimetype": "text/tsv"
+                },
+                "threads_fit_to_data": {
+                    "type": "boolean",
+                    "description": "Whether to fit the model to the data",
+                    "help_text": "If specified, Threads performs a post-processing step to ensure the inferred ARG contains an edge matching each input mutation."
                 },
                 "threads_query_interval": {
                     "type": "number",
                     "default": 0.01,
                     "description": "Hyperparameter for the preliminary haplotype matching in cM"
                 },
-                "threads_mutation_rate": {
-                    "type": "number",
-                    "default": 1.4e-8,
-                    "description": "The estimated mutation rate per unit of genome per unit time for THREADS"
+                "threads_mode": {
+                    "type": "string",
+                    "default": "wgs",
+                    "description": "Inference mode: should be one of \"wgs\" or \"array\"",
+                    "enum": ["wgs", "array"]
                 }
             }
         },
