@@ -95,7 +95,6 @@
             "properties": {
                 "tsdate_ne": {
                     "type": "integer",
-                    "default": 10000,
                     "description": "The estimated (diploid) effective population size used to construct the (default) conditional coalescent prior"
                 },
                 "tsdate_method": {
