@@ -97,7 +97,7 @@ workflow TREESEQ {
                     checkIfExists: true
                 )
             } else {
-                // crate a default demography file using Ne
+                // create a default demography file using Ne
                 demography_ch = channel.of("0 ${params.threads_ne}")
                     | map { content ->
                         def tsv_file = file("${workDir}/demography_default.tsv")
