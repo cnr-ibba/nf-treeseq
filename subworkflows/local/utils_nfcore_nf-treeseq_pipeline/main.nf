@@ -91,8 +91,8 @@ workflow PIPELINE_INITIALISATION {
     }
 
     if (params.ancestor_method == 'threads') {
-        if (!params.threads_demography_file) {
-            error "ERROR: 'threads_demography_file' is required when ancestor_method is 'threads'"
+        if (!params.threads_demography_file && !params.threads_ne) {
+            error "ERROR: 'threads_demography_file' or 'threads_ne' is required when ancestor_method is 'threads'"
         }
     }
 
