@@ -25,6 +25,7 @@ process TSINFER_CUSTOM {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     def args = task.ext.args ?: ''
+    def ne_arg = params.tsdate_ne ? "--ne ${params.tsdate_ne}" : ''
     """
     mkfifo ${prefix}.trees
 
@@ -43,7 +44,7 @@ process TSINFER_CUSTOM {
         --ancestral_ensembl ${ancestor_file} \\
         --mutation_rate "${params.mutation_rate}" \\
         --recombination_rate "${params.recombination_rate}" \\
-        --ne "${params.tsdate_ne}" \\
+        ${ne_arg} \\
         --tsdate_method "${params.tsdate_method}" \\
         --output_samples ${prefix}.samples \\
         --output_trees ${prefix}.trees \\
