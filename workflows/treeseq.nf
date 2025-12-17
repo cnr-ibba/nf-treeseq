@@ -90,9 +90,23 @@ workflow TREESEQ {
             ch_versions = ch_versions.mix(CUSTOM.out.versions)
         } else if (params.ancestor_method == 'threads') {
             // create tree sequences using https://palamaralab.github.io/software/threads/
-            // open demography file:
-            demography_ch = channel.fromPath( params.threads_demography_file, checkIfExists: true )
+            // open demography file (if provided) or create a default one using Ne
+            if (params.threads_demography_file) {
+                demography_ch = channel.fromPath(
+                    params.threads_demography_file,
+                    checkIfExists: true
+                )
+            } else {
+                // create a default demography file using Ne
+                demography_ch = channel.of("0 ${params.threads_ne}")
+                    | map { content ->
+                        def tsv_file = file("${workDir}/demography_default.tsv")
+                        tsv_file.text = content
+                        return tsv_file
+                    }
+            }
 
+            // call threads subworkflow
             THREADS(
                 VCF_EXTRACT.out.vcf.join(VCF_EXTRACT.out.tbi),
                 demography_ch,

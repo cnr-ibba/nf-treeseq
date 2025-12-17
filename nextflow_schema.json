@@ -95,7 +95,6 @@
             "properties": {
                 "tsdate_ne": {
                     "type": "integer",
-                    "default": 10000,
                     "description": "The estimated (diploid) effective population size used to construct the (default) conditional coalescent prior"
                 },
                 "tsdate_method": {
@@ -116,8 +115,14 @@
                     "type": "string",
                     "format": "file-path",
                     "description": "Demography file for threads method",
-                    "help_text": "Required for method: threads",
+                    "help_text": "Optional for method: threads. If not provided, a default demography file will be generated using threads_ne parameter.",
                     "mimetype": "text/tsv"
+                },
+                "threads_ne": {
+                    "type": "integer",
+                    "default": 10000,
+                    "description": "Effective population size for the entire simulation",
+                    "help_text": "Will create a demography file with a single population of size Ne"
                 },
                 "threads_fit_to_data": {
                     "type": "boolean",

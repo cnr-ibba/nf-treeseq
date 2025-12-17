@@ -90,9 +90,28 @@ workflow PIPELINE_INITIALISATION {
         }
     }
 
+    if (params.ancestor_method in ['major', 'reference', 'custom', 'est-sfs'] &&
+        params.tsdate_ne &&
+        params.tsdate_method == 'variational_gamma') {
+
+        log.warn """
+        Parameter Compatibility Warning
+        ================================
+        Parameter:  tsdate_ne = ${params.tsdate_ne}
+        Status:     IGNORED
+        Reason:     Not compatible with current configuration
+
+        Configuration:
+            - ancestor_method:  ${params.ancestor_method}
+            - tsdate_method:    ${params.tsdate_method}
+
+        Action:     Pipeline will continue, but tsdate_ne will have no effect
+        """.stripIndent()
+    }
+
     if (params.ancestor_method == 'threads') {
-        if (!params.threads_demography_file) {
-            error "ERROR: 'threads_demography_file' is required when ancestor_method is 'threads'"
+        if (!params.threads_demography_file && !params.threads_ne) {
+            error "ERROR: 'threads_demography_file' or 'threads_ne' is required when ancestor_method is 'threads'"
         }
     }
 
