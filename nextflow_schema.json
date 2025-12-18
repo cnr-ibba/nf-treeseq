@@ -115,14 +115,14 @@
                     "type": "string",
                     "format": "file-path",
                     "description": "Demography file for threads method",
-                    "help_text": "Optional for method: threads. If not provided, a default demography file will be generated using threads_ne parameter.",
+                    "help_text": "Tab-separated text file (TSV) with no header row and exactly two columns: (1) generations in the past (integer, generations before the present) and (2) effective population size in haploids. Note: effective population size is often reported in diploids; multiply diploid values by 2 before using such demographies. Example (two lines): \"0\\t20000\" and \"1000\\t15000\". Optional for method: threads. If not provided, a default demography file with constant Ne will be generated using the threads_ne parameter. See the pipeline documentation for further details.",
                     "mimetype": "text/tsv"
                 },
                 "threads_ne": {
                     "type": "integer",
                     "default": 10000,
-                    "description": "Effective population size for the entire simulation",
-                    "help_text": "Will create a demography file with a single population of size Ne"
+                    "description": "Effective population size in haploids for the entire simulation (i.e. two times the diploid value)",
+                    "help_text": "Will create a demography file with the given constant effective population size if no demography file is provided."
                 },
                 "threads_fit_to_data": {
                     "type": "boolean",
