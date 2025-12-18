@@ -32,7 +32,7 @@
   > for whole-genome association and population-based
   > linkage analysis. American Journal of Human Genetics.
 
-- [PLINK 2.00a2.3](www.cog-genomics.org/plink/2.0/)
+- [PLINK 2.00a2.3](https://www.cog-genomics.org/plink/2.0/)
 
   > Chang CC, Chow CC, Tellier LCAM, Vattikuti S, Purcell SM, Lee JJ (2015) Second-generation PLINK: rising to the challenge of larger and richer datasets. GigaScience, 4.
 
