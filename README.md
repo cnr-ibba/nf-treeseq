@@ -19,10 +19,12 @@ A Nextflow pipeline for generating Tree Sequences from PLINK and VCF files.
 **cnr-ibba/nf-treeseq** is a bioinformatics pipeline that infers phylogenetic tree
 sequences from genotype data in PLINK or VCF format. The pipeline performs quality
 control, format conversion, variant normalization, imputation and phasing using
-Beagle, and finally generates tree sequences using `tsinfer`. It supports multiple
-methods for determining ancestral alleles, including reference-based, frequency-based
-(major allele), estimation via `est-sfs` with outgroup samples, or custom
-user-provided ancestral states.
+Beagle, and finally generates tree sequences using `tsinfer` from the `tskit` library.
+It supports multiple methods for determining ancestral alleles using `tsinfer`,
+including _reference-based_, _frequency-based (major allele)_, estimation via
+`est-sfs` with _outgroup samples_, or custom _user-provided ancestral states_.
+In addition, is also possible to skip the `tsinfer` inference steps and create
+tree sequences using `threads`.
 
 <!-- TODO cnr-ibba: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
@@ -30,35 +32,24 @@ user-provided ancestral states.
 **Main pipeline steps:**
 
 1. **Input Processing**: Reads PLINK binary files (.bed/.bim/.fam) and applies
-   sample filtering and SNP quality control
-2. **Format Conversion**: Converts PLINK data to VCF format using `plink`
-3. **Variant Normalization**: Normalizes ALT/REF alleles and validates chromosome sizes against reference genome using `bcftools`
-4. **Imputation & Phasing**: Imputes missing genotypes and phases haplotypes using Beagle
-5. **Ancestral Allele Inference**: Determines ancestral alleles via one of four methods (reference, major allele, `est-sfs`, or custom)
-6. **Tree Sequence Generation**: Creates tree sequence files using `tsinfer` with inferred ancestral states
+   sample filtering and SNP quality control (est-sfs/tsinfer approach). Start from VCF
+   files for all the other methods.
+2. **Variant Normalization**: Normalizes ALT/REF alleles and validates chromosome sizes against reference genome using `bcftools`
+3. **Imputation & Phasing**: Imputes missing genotypes and phases haplotypes using Beagle
+4. **Ancestral Allele Inference**: Determines ancestral alleles via one of 5 methods (reference, major allele, `est-sfs`, or custom for the `tsinfer` approach; skip for `threads` approach)
+5. **Tree Sequence Generation**: Creates tree sequence files using `tsinfer` with inferred ancestral states or `threads` directly from phased haplotypes.
 
 ## Background
 
 This pipeline is designed to infer _Tree Sequences_ from population genetic data,
 providing a compact and efficient representation of genealogical relationships
-across the genome. Tree sequences, as implemented by the `tskit` library and
-inferred by `tsinfer`, offer a powerful framework for population genomic analyses
+across the genome. Tree sequences, as implemented by the `tskit` library can
+be inferred by `tsinfer` and `threads`, and offer a powerful framework for
+population genomic analyses
 by encoding coalescent histories along the genome.
 
-The pipeline accepts PLINK binary genotype files (.bed/.bim/.fam format) as input,
-where all samples of interest are contained within a single file set. The workflow
-performs the following key transformations:
-
-1. **Quality Control & Filtering**: Applies PLINK-based SNP filtering
-   (e.g., `--geno` for missing rate) and sample selection (via `--keep` file)
-2. **VCF Conversion**: Transforms PLINK binary format to VCF, enabling
-   integration with modern genomic tools
-3. **Allele Normalization**: Uses a reference genome to correct ALT/REF
-   allele designations and validate chromosome coordinates via `bcftools norm`
-4. **Imputation & Phasing**: Employs Beagle to fill missing genotypes and
-   resolve haplotype phase, which are critical prerequisites for accurate tree sequence inference
-5. **Tree Sequence Inference**: Runs `tsinfer` to reconstruct ancestral
-   recombination graphs (ARGs) from phased haplotypes
+The pipeline accepts PLINK binary genotype files (.bed/.bim/.fam format) or VCF files
+as input, where all samples of interest are contained within a single file set.
 
 A key requirement for `tsinfer` is the specification of ancestral alleles at
 each variant site. The pipeline offers flexible approaches to meet this requirement,
@@ -79,6 +70,13 @@ the pipeline supports four different methods for determining ancestral alleles:
    (ancestral to the rest of the data) in the dataset.
 4. **Using `custom`**: This method requires an additional CSV file containing
    the ancestral alleles.
+
+### About the `threads` method
+
+In addition to `tsinfer`, the pipeline also supports generating tree sequences
+using `threads`. This method does not require ancestral alleles and directly
+creates tree sequences from phased haplotypes. This can be useful when ancestral
+alleles are not available or when a simpler approach is desired.
 
 ## Getting the Pipeline
 
@@ -134,22 +132,35 @@ Where:
 The pipeline requires PLINK binary format genotype files as input.
 Ensure you have the following files ready:
 
-- **PLINK binary files**: `.bed`, `.bim`, and `.fam` files with the same prefix (e.g., `mydata.bed`, `mydata.bim`, `mydata.fam`)
+- **PLINK binary files**: `.bed`, `.bim`, and `.fam` files with the same prefix (e.g., `mydata.bed`, `mydata.bim`, `mydata.fam` for `tsinfer/est-sfs` approach;
+- **VCF files with indexes**: One or more VCF with index file containing all samples for all other approaches
 - **Reference genome**: A FASTA file (optionally compressed) for allele normalization
-- **Sample keep file** (optional): TSV file with `FID` and `IID` columns to specify samples to retain
+- **Sample/Population file**: TSV file with `FID` and `IID` columns to specify samples to retain and to annotate populations
 - **Outgroup files** (optional, for `est-sfs` method): One to three TSV files with `FID` and `IID` columns identifying outgroup samples
 - **Custom ancestral allele file** (optional, for `custom` method): CSV file with ancestral allele information
 
-First, prepare a samplesheet with your input data that looks as follows:
+#### PLINK samplesheet
 
-`samplesheet.csv`:
+Prepare a samplesheet like the following for PLINK data:
 
 ```csv
 sample,plink_bfile
 test,tests/test_dataset
 ```
 
-Each row represents a PLINK binary file prefix (i.e., without the `.bed/.bim/.fam` extensions) while the sample is an identifier for that dataset.
+Each row represents a PLINK binary file prefix (i.e., without the `.bed/.bim/.fam`
+extensions) while the sample is an identifier for that dataset. This file can be
+used only for `tsinfer/est-sfs` approach.
+
+#### VCF samplesheet
+
+Prepare a samplesheet like the following for VCF data:
+
+```csv
+sample,vcf,index
+test,tests/test_dataset.vcf.gz,tests/test_dataset.vcf.gz.tbi
+test2,tests/test_dataset2.vcf.gz,tests/test_dataset2.vcf.gz.tbi
+```
 
 ### Creating a Parameters File
 
@@ -159,8 +170,8 @@ Create a file named `params.json` with at minimum the following required paramet
 
 ```json
 {
-  "plink_bfile": "path/to/mydata",
-  "plink_species": "--chr-set 26 no-xy no-mt --allow-no-sex",
+  "input": "path/to/samplesheet.csv",
+  "sample2fid": "path/to/sample2fid.tsv",
   "genome": "path/to/reference_genome.fasta.gz",
   "ancestor_method": "reference",
   "outdir": "results"
@@ -169,28 +180,27 @@ Create a file named `params.json` with at minimum the following required paramet
 
 #### Core Parameters Explained:
 
-- **`plink_species`** (required): Species-specific PLINK options
-  - For standard human data: `"--species human"` or leave empty
-  - For non-model organisms: `"--chr-set <N> no-xy no-mt --allow-no-sex"` where `<N>` is the number of autosomes
-  - Example for sheep (26 autosomes): `"--chr-set 26 no-xy no-mt --allow-no-sex"`
+- **`input`** (required): Path to the samplesheet CSV file
+  - For `tsinfer/est-sfs` approach: PLINK samplesheet with `sample` and `plink_bfile` columns
+  - For all other approaches: VCF samplesheet with `sample`, `vcf`, and `index` columns
+
+- **`sample2fid`** (required): TSV file with `FID` and `IID` columns to filter samples
+  and annotate populations
 
 - **`genome`** (required): Reference genome FASTA file for variant normalization
   - Can be compressed (`.fasta.gz`) or uncompressed (`.fasta`)
   - Must match the genome build used for genotyping
 
 - **`ancestor_method`** (required): Method for determining ancestral alleles
-  - Options: `"reference"` (default), `"major"`, `"est-sfs"`, or `"custom"`
+  - Options: `"reference"` (default), `"major"`, `"est-sfs"`, `"custom"`, `"threads"`
   - See [Specifying Ancestral Alleles](#specifying-ancestral-alleles) section below
 
 - **`outdir`** (optional): Output directory for results (default: `"results"`)
 
 #### Optional Quality Control Parameters:
 
-- **`sample2fid`**: TSV file with `FID` and `IID` columns to filter samples
-
-  ```json
-  "sample2fid": "samples_to_keep.tsv"
-  ```
+- **`plink_species`**: PLINK specie specific options valid for your data
+  (`est-sfs/tsinfer` approach only and threads VCF to plink conversion )
 
 - **`plink_geno`**: Maximum missing rate per SNP (default: `0.1`)
   ```json
@@ -258,6 +268,16 @@ After generating the file, specify it using the `ancestor_file` parameter:
 }
 ```
 
+#### 5. Using `threads` Method
+
+To generate tree sequences using the `threads` method, which does not require ancestral alleles, set the `ancestor_method` flag to `threads`:
+
+```json
+{
+  "ancestor_method": "threads"
+}
+```
+
 ### Additional Parameters
 
 Additional parameters can be set in the configuration file to control the pipeline or specify the output directory. To see all available options, run:
@@ -292,8 +312,6 @@ nextflow run cnr-ibba/nf-treeseq \
    --outdir custom_output
 ```
 
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
-
 To test the pipeline with the included test dataset:
 
 ```bash
@@ -308,7 +326,12 @@ cnr-ibba/nf-treeseq was originally written by Paolo Cozzi.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+- Hannes Becher
+- Arianna Manunza
+- Jana Obšteter
+- Gabriela Mafra Fortuna
+- Gregor Gorianc
+- Filippo Biscarini
 
 ## Contributions and Support
 
