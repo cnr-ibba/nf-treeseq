@@ -1,0 +1,36 @@
+nextflow_pipeline {
+
+    name "Test pipeline with est-sfs"
+    script "../main.nf"
+    tag "est-sfs"
+
+    test("-profile test") {
+
+        when {
+            params {
+                input ="${projectDir}/assets/samplesheet_plink.csv"
+                outdir = "$outputDir"
+                ancestor_method = 'est-sfs'
+                plink_species = "--chr-set 26 no-xy no-mt --allow-no-sex"
+                outgroup1 = "$projectDir/tests/test_outgroup.tsv"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content (excluding non-deterministic files via .nftignore)
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.succeeded().size() > 0 },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // All stable path names with relative paths
+                    stable_name
+                ).match() }
+            )
+        }
+    }
+}

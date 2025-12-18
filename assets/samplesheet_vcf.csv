@@ -1,0 +1,2 @@
+sample,vcf,index
+test,https://github.com/cnr-ibba/nf-treeseq/raw/refs/heads/dev/tests/test_dataset.focal.norm.vcf.gz,https://github.com/cnr-ibba/nf-treeseq/raw/refs/heads/dev/tests/test_dataset.focal.norm.vcf.gz.tbi

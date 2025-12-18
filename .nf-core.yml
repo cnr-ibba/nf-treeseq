@@ -1,1 +1,49 @@
+lint:
+  files_exist:
+    - .github/workflows/awstest.yml
+    - .github/workflows/awsfulltest.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - CODE_OF_CONDUCT.md
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - assets/nf-core-nf-treeseq_logo_light.png
+    - assets/multiqc_config.yml
+    - docs/images/nf-core-nf-treeseq_logo_light.png
+    - docs/images/nf-core-nf-treeseq_logo_dark.png
+  files_unchanged:
+    - .prettierignore
+    - .gitattributes
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/CONTRIBUTING.md
+    - .github/workflows/branch.yml
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-nf-treeseq_logo_light.png
+    - assets/email_template.html
+    - assets/email_template.txt
+    - assets/sendmail_template.txt
+    - docs/images/nf-core-nf-treeseq_logo_light.png
+    - docs/images/nf-core-nf-treeseq_logo_dark.png
+    - docs/README.md
+  multiqc_config: false
+  nextflow_config: false
+  nf_test_content: false
+nf_core_version: 3.5.1
 repository_type: pipeline
+template:
+  author: Paolo Cozzi
+  description: Generate TreeSequence files from genotype data
+  force: false
+  is_nfcore: false
+  name: nf-treeseq
+  org: cnr-ibba
+  outdir: .
+  skip_features:
+    - igenomes
+    - multiqc
+    - fastqc
+    - gpu
+    - rocrate
+    - adaptivecard
+    - slackreport
+  version: 0.3.0

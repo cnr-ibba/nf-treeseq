@@ -1,7 +1,7 @@
 //
 // call tsinfer by setting ancestrall alleles as defined by est-sfs
 //
-include { PLINK_SUBSET as ANCIENT_SUBSET    } from '../../modules/local/plink_subset.nf'
+include { PLINK_SUBSET as ANCIENT_SUBSET    } from '../../modules/local/plink/subset/main'
 include { PLINK_RECODE as ANCIENT_RECODE    } from '../../modules/nf-core/plink/recode/main'
 include { BCFTOOLS_NORM as ANCIENT_NORM     } from '../../modules/nf-core/bcftools/norm/main'
 include { BCFTOOLS_SPLIT as ANCIENT_SPLIT   } from '../../modules/nf-core/bcftools/split/main'
@@ -9,16 +9,17 @@ include {
     TABIX_TABIX as ANCIENT_TABIX;
     TABIX_TABIX as ANCIENT_SPLIT_TABIX      } from '../../modules/nf-core/tabix/tabix/main'
 include { BCFTOOLS_MERGE                    } from '../../modules/nf-core/bcftools/merge/main'
-include { ESTSFS_INPUT                      } from '../../modules/local/estsfs_input'
+include { ESTSFS_INPUT                      } from '../../modules/local/estsfs/input/main'
 include { ESTSFS                            } from '../../modules/cnr-ibba/estsfs/main'
-include { ESTSFS_OUTPUT                     } from '../../modules/local/estsfs_output'
-include { TSINFER_ESTSFS                    } from '../../modules/local/tsinfer_estsfs'
+include { ESTSFS_OUTPUT                     } from '../../modules/local/estsfs/output/main'
+include { TSINFER_ESTSFS                    } from '../../modules/local/tsinfer/estsfs/main'
 
 
 process GENERATE_SEED {
     output:
     path 'seedfile.txt'
 
+    script:
     '''
     echo $RANDOM > seedfile.txt
     '''
@@ -31,20 +32,20 @@ workflow EST_SFS {
     outgroup1           // string: outgroup1 name
     outgroup2           // string: outgroup2 name (can be null)
     outgroup3           // string: outgroup3 name (can be null)
-    plink_input_ch      // Channel: plink input files [ meta, Path(bed), Path(bim), Path(fam) ]
-    genome_ch           // Channel: genome files [ meta, Path(fasta) ]
-    focal_vcf_ch        // Channel: focal vcf file (phased) [ meta, Path(vcf) ]
-    focal_tbi_ch        // Channel: focal tbi file (phased) [ meta, Path(tbi) ]
-    samples_ch          // Channel: samples file [ meta, Path(samples) ]
+    plink_input_ch      // channel: plink input files [ meta, Path(bed), Path(bim), Path(fam) ]
+    genome_ch           // channel: genome files [ meta, Path(fasta) ]
+    focal_vcf_ch        // channel: focal vcf file (phased) [ meta, Path(vcf) ]
+    focal_tbi_ch        // channel: focal tbi file (phased) [ meta, Path(tbi) ]
+    samples_ch          // channel: samples file [ meta, Path(samples) ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     // collect the outgroup sample list files. At least one outgroup
-    outgroup1_ch = Channel.fromPath( outgroup1, checkIfExists: true)
-    outgroup2_ch = outgroup2 ? Channel.fromPath(params.outgroup2, checkIfExists: true): Channel.empty()
-    outgroup3_ch = outgroup3 ? Channel.fromPath(params.outgroup3, checkIfExists: true): Channel.empty()
+    outgroup1_ch = channel.fromPath( outgroup1, checkIfExists: true)
+    outgroup2_ch = outgroup2 ? channel.fromPath(params.outgroup2, checkIfExists: true): channel.empty()
+    outgroup3_ch = outgroup3 ? channel.fromPath(params.outgroup3, checkIfExists: true): channel.empty()
     outgroup_files_ch = outgroup1_ch
         .concat(outgroup2_ch)
         .concat(outgroup3_ch)
@@ -93,7 +94,7 @@ workflow EST_SFS {
             ANCIENT_SPLIT.out.split_vcf
                 .transpose()
                 .map{ meta, vcf ->
-                    chrom = vcf.name.tokenize(".")[-3]
+                    def chrom = vcf.name.tokenize(".")[-3]
                     [[id: "samples-merged.${chrom}"], vcf]
                 }
         )
@@ -106,7 +107,7 @@ workflow EST_SFS {
         .concat(
             ANCIENT_SPLIT_TABIX.out.tbi
                 .map{ meta, tbi ->
-                    chrom = tbi.name.tokenize(".")[-4]
+                    def chrom = tbi.name.tokenize(".")[-4]
                     [[id: "samples-merged.${chrom}"], tbi]
                 }
         )
@@ -117,16 +118,17 @@ workflow EST_SFS {
         // .view()
 
     // merge the ancient and focal vcf
-    BCFTOOLS_MERGE(bcftools_input_ch, [[], []], [[], []], [])
+    BCFTOOLS_MERGE(bcftools_input_ch, [[], []], [[], []], [[], []])
     ch_versions = ch_versions.mix(BCFTOOLS_MERGE.out.versions)
 
     // calculate ancestral alleles. I need to use the first() method to transform
     // the queue in a value channel
     ESTSFS_INPUT(
-        BCFTOOLS_MERGE.out.merged_variants,
+        BCFTOOLS_MERGE.out.vcf,
         samples_ch.first(),
         outgroup_files_ch.collect()
     )
+    ch_versions = ch_versions.mix(ESTSFS_INPUT.out.versions)
 
     // determine a seedfile
     seedfile = GENERATE_SEED()
@@ -140,18 +142,19 @@ workflow EST_SFS {
     ch_versions = ch_versions.mix(ESTSFS.out.versions)
 
     ESTSFS_OUTPUT(ESTSFS_INPUT.out.mapping.join(ESTSFS.out.pvalues_out))
+    ch_versions = ch_versions.mix(ESTSFS_OUTPUT.out.versions)
 
     tsinfer_in_ch = focal_vcf_ch
         .map{ meta, vcf -> [meta.chrom, meta, vcf] }
         .join(
             ESTSFS_OUTPUT.out.ancestral
                 .map{ meta, ancestral ->
-                        chrom = ancestral.name.tokenize(".")[-3]
+                        def chrom = ancestral.name.tokenize(".")[-3]
                         [chrom, ancestral]
                 },
             by: [0],
             failOnMismatch: true
-        ).map{ chrom, meta, vcf, ancestral -> [[id: meta.id], vcf, ancestral]}
+        ).map{ _chrom, meta, vcf, ancestral -> [[id: meta.id], vcf, ancestral]}
         // .view()
 
     // now create a tstree file
@@ -159,6 +162,7 @@ workflow EST_SFS {
         tsinfer_in_ch,
         samples_ch.first()
     )
+    ch_versions = ch_versions.mix( TSINFER_ESTSFS.out.versions )
 
     emit:
 
