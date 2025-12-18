@@ -23,7 +23,7 @@ Beagle, and finally generates tree sequences using `tsinfer` from the `tskit` li
 It supports multiple methods for determining ancestral alleles using `tsinfer`,
 including _reference-based_, _frequency-based (major allele)_, estimation via
 `est-sfs` with _outgroup samples_, or custom _user-provided ancestral states_.
-In addition, is also possible to skip the `tsinfer` inference steps and create
+In addition, it is also possible to skip the `tsinfer` inference steps and create
 tree sequences using `threads`.
 
 <!-- TODO cnr-ibba: Include a figure that guides the user through the major workflow steps. Many nf-core
@@ -36,7 +36,7 @@ tree sequences using `threads`.
    files for all the other methods.
 2. **Variant Normalization**: Normalizes ALT/REF alleles and validates chromosome sizes against reference genome using `bcftools`
 3. **Imputation & Phasing**: Imputes missing genotypes and phases haplotypes using Beagle
-4. **Ancestral Allele Inference**: Determines ancestral alleles via one of 5 methods (reference, major allele, `est-sfs`, or custom for the `tsinfer` approach; skip for `threads` approach)
+4. **Ancestral Allele Inference**: Determines ancestral alleles via one of 4 methods for the `tsinfer` approach (reference, major allele, `est-sfs`, or custom), or skips ancestral allele inference entirely when using the `threads` approach
 5. **Tree Sequence Generation**: Creates tree sequence files using `tsinfer` with inferred ancestral states or `threads` directly from phased haplotypes.
 
 ## Background
@@ -132,10 +132,10 @@ Where:
 The pipeline requires PLINK binary format genotype files as input.
 Ensure you have the following files ready:
 
-- **PLINK binary files**: `.bed`, `.bim`, and `.fam` files with the same prefix (e.g., `mydata.bed`, `mydata.bim`, `mydata.fam` for `tsinfer/est-sfs` approach;
+- **PLINK binary files**: `.bed`, `.bim`, and `.fam` files with the same prefix (e.g., `mydata.bed`, `mydata.bim`, `mydata.fam`) for the `tsinfer/est-sfs` approach.
 - **VCF files with indexes**: One or more VCF with index file containing all samples for all other approaches
 - **Reference genome**: A FASTA file (optionally compressed) for allele normalization
-- **Sample/Population file**: TSV file with `FID` and `IID` columns to specify samples to retain and to annotate populations
+- **Sample/Population file**: Tab-separated text file **with a header row** containing at least `FID`, `IID`, and a population column (e.g. `POP`) to specify which samples to retain and their population assignment. `FID` and `IID` must match the corresponding IDs in your PLINK/VCF data; additional columns (if present) are ignored by the pipeline.
 - **Outgroup files** (optional, for `est-sfs` method): One to three TSV files with `FID` and `IID` columns identifying outgroup samples
 - **Custom ancestral allele file** (optional, for `custom` method): CSV file with ancestral allele information
 
@@ -199,8 +199,8 @@ Create a file named `params.json` with at minimum the following required paramet
 
 #### Optional Quality Control Parameters:
 
-- **`plink_species`**: PLINK specie specific options valid for your data
-  (`est-sfs/tsinfer` approach only and threads VCF to plink conversion )
+- **`plink_species`**: PLINK species-specific options valid for your data
+  (`est-sfs/tsinfer` approach only and threaded VCF-to-PLINK conversion)
 
 - **`plink_geno`**: Maximum missing rate per SNP (default: `0.1`)
   ```json

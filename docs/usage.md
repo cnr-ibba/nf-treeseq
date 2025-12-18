@@ -14,7 +14,7 @@ You will need to create a samplesheet with information about the samples you wou
 --input '[path to samplesheet file]'
 ```
 
-There are two distinct type of samplesheet depending on whether you have VCF files
+There are two distinct types of samplesheet depending on whether you have VCF files
 or PLINK files as input. Please refer to the sections below for details.
 
 ### PLINK samplesheet

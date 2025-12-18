@@ -1,4 +1,4 @@
--# cnr-ibba/nf-treeseq: Changelog
+# cnr-ibba/nf-treeseq: Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -89,7 +89,7 @@ First release of nf-treeseq pipeline, which comes out from [bunop/TSKITetude](ht
 project. Set up the core structure and implemented
 tree sequence inference using est-sfs or reference-based approach. Processing
 start from a PLINK binary file and a reference genome where focal samples are
-selected, which ancenstor alleles are determined using est-sfs or the reference genome.
+selected, which ancestor alleles are determined using est-sfs or the reference genome.
 Data are then converted to VCF format, imputed and phased using beagle, and finally
 tree sequences are inferred using tsinfer through custom scripts.
 
