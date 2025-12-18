@@ -135,7 +135,7 @@ Ensure you have the following files ready:
 - **PLINK binary files**: `.bed`, `.bim`, and `.fam` files with the same prefix (e.g., `mydata.bed`, `mydata.bim`, `mydata.fam`) for the `tsinfer/est-sfs` approach.
 - **VCF files with indexes**: One or more VCF with index file containing all samples for all other approaches
 - **Reference genome**: A FASTA file (optionally compressed) for allele normalization
-- **Sample/Population file**: Tab-separated text file **with a header row** containing at least `FID`, `IID`, and a population column (e.g. `POP`) to specify which samples to retain and their population assignment. `FID` and `IID` must match the corresponding IDs in your PLINK/VCF data; additional columns (if present) are ignored by the pipeline.
+- **Sample/Population file**: Tab-separated text file **without a header row** containing `FID`, `IID`, like required by PLINK to specify which samples to retain and their population assignment. `FID` and `IID` must match the corresponding IDs in your PLINK/VCF data.
 - **Outgroup files** (optional, for `est-sfs` method): One to three TSV files with `FID` and `IID` columns identifying outgroup samples
 - **Custom ancestral allele file** (optional, for `custom` method): CSV file with ancestral allele information
 
